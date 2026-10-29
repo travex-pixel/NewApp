@@ -1,29 +1,34 @@
-# NewApp
+# Instinct
 
-A web app built with Next.js (App Router), deployed on Vercel, with Supabase for the database, auth and storage. Styling uses Tailwind CSS and shadcn/ui.
+A social intelligence game: real situations, hard choices, one transferable idea per reveal. Next.js 16 App Router (Cache Components on), TypeScript strict, Tailwind CSS 4, deployed on Vercel. No database, no accounts, no LLM at runtime.
+
+Read `PRODUCT.md` (what it is and isn't), `DESIGN.md` (the paper-and-ink system) and `ANALYTICS.md` (events) before changing anything user-facing.
 
 ## Working rules
 
-- Next.js, React and Supabase APIs change between versions. Check the version in `package.json` and read the matching docs below before using an API you're not sure about. Don't rely on memory.
-- Default to Server Components. Add `"use client"` only when a component needs state, effects or browser APIs.
-- Never expose secrets to the browser. Only variables prefixed `NEXT_PUBLIC_` reach the client; the Supabase service role key must stay server-side.
-- Every Supabase table gets Row Level Security policies before it holds user data.
+- This Next.js is newer than training data. Read `node_modules/next/dist/docs/` for the API in question before using it; don't rely on memory. Cache Components means runtime APIs (`params`, `searchParams`, `cookies`, `Date.now()` in server components) must sit under `<Suspense>`.
+- Server Components by default. `"use client"` only for state, effects, browser APIs.
+- Only `NEXT_PUBLIC_*` variables reach the browser. There are no secrets in this project yet; keep it that way unless a server-side integration genuinely needs one.
+- Content is append-only: never reorder or delete entries in `lib/content/` because challenge codes encode positions. Run `npm test` after editing scenarios; the tests enforce the content rules.
+- No fake data: no invented user counts, testimonials, scores, or science. The score is explicitly "how you played this round".
+- Analytics go through `lib/analytics` only. Add new events to `lib/analytics/events.ts` and document them in `ANALYTICS.md`.
+- Before pushing: `npm run typecheck && npm run lint && npm test && npm run build`.
 
 ## Skills in this repo
 
-- `/impeccable` for UI design: start new work with `/impeccable init`, then `craft`, `polish`, `audit`.
-- `vercel-react-best-practices` and `vercel-composition-patterns` for React and Next.js code.
-- `web-design-guidelines` for accessibility and UX reviews.
-- `vercel-react-view-transitions` for page and route animations.
-- `deploy-to-vercel` to deploy, and `vercel-optimize` to check cost and caching on a live deployment.
+- `/impeccable` for UI work (`polish`, `audit`, `critique`, `adapt`). `DESIGN.md` and `PRODUCT.md` are its inputs.
+- `vercel-react-best-practices`, `vercel-composition-patterns` for React/Next.js code.
+- `web-design-guidelines` for accessibility and UX review.
+- `vercel-react-view-transitions` if route animations are added.
+- `deploy-to-vercel`, `vercel-optimize` for deployment and cost/caching on a live deployment.
 
 ## Reference docs
 
 ### Next.js
+- Local, version-exact: `node_modules/next/dist/docs/01-app/`
 - Docs: https://nextjs.org/docs
-- Getting started (App Router): https://nextjs.org/docs/app/getting-started
-- Caching: https://nextjs.org/docs/app/guides/caching
-- Release notes: https://nextjs.org/blog
+- Caching (Cache Components): https://nextjs.org/docs/app/getting-started/caching
+- Metadata and OG images: https://nextjs.org/docs/app/getting-started/metadata-and-og-images
 
 ### React
 - API reference: https://react.dev/reference/react
@@ -33,16 +38,11 @@ A web app built with Next.js (App Router), deployed on Vercel, with Supabase for
 - Docs: https://vercel.com/docs
 - Next.js on Vercel: https://vercel.com/docs/frameworks/nextjs
 - Environment variables: https://vercel.com/docs/environment-variables
-- Functions: https://vercel.com/docs/functions
+- Web Analytics custom events: https://vercel.com/docs/analytics/custom-events
 
-### Supabase
-- Docs: https://supabase.com/docs
-- Next.js quickstart: https://supabase.com/docs/guides/getting-started/quickstarts/nextjs
-- Auth with Next.js (server-side): https://supabase.com/docs/guides/auth/server-side/nextjs
-- Row Level Security: https://supabase.com/docs/guides/database/postgres/row-level-security
-- Storage: https://supabase.com/docs/guides/storage
+### Analytics
+- PostHog JS: https://posthog.com/docs/libraries/js
 
-### Styling and UI
-- Tailwind CSS: https://tailwindcss.com/docs
-- shadcn/ui: https://ui.shadcn.com/docs
+### Styling
+- Tailwind CSS v4: https://tailwindcss.com/docs
 - Vercel web interface guidelines: https://vercel.com/design/guidelines

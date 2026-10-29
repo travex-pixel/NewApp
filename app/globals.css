@@ -1,0 +1,476 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------
+   Instinct — design tokens
+   Paper for the situation and the decision. Ink for the reveal.
+   One accent: signal (vermilion). Nothing else gets colour.
+   ------------------------------------------------------------------ */
+
+:root {
+  --paper: #f3eee4;
+  --paper-2: #e8e1d2;
+  --paper-3: #ddd5c3;
+  --ink: #1b1917;
+  --ink-2: #4a453f;
+  --ink-3: #7a736a;
+  --rule: #cfc6b6;
+  --signal: #b8371a;
+  --signal-on-ink: #f0623a;
+  --paper-on-ink: #f3eee4;
+  --paper-on-ink-2: #b9b1a3;
+  --rule-on-ink: #3a3631;
+
+  --bg: var(--paper);
+  --fg: var(--ink);
+  --fg-2: var(--ink-2);
+  --fg-3: var(--ink-3);
+  --line: var(--rule);
+  --accent: var(--signal);
+  --surface-2: var(--paper-2);
+
+  --font-display: var(--font-fraunces), "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --font-sans: var(--font-instrument), "Helvetica Neue", Arial, sans-serif;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --measure: 38rem;
+  --gutter: 20px;
+
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-signal: var(--signal);
+  --font-display: var(--font-display);
+  --font-sans: var(--font-sans);
+}
+
+/* The ink world: the reveal, the result, the challenge framing. */
+.ink,
+[data-theme="ink"] {
+  --bg: var(--ink);
+  --fg: var(--paper-on-ink);
+  --fg-2: var(--paper-on-ink-2);
+  --fg-3: #8d8578;
+  --line: var(--rule-on-ink);
+  --accent: var(--signal-on-ink);
+  --surface-2: #26231f;
+  color-scheme: dark;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+/* ------------------------------------------------------------------
+   Base
+   ------------------------------------------------------------------ */
+
+html {
+  background: var(--paper);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.55;
+  font-feature-settings: "kern", "liga", "ss01";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Browser surfaces carry the design too. */
+::selection {
+  background: var(--accent);
+  color: var(--paper);
+}
+.ink ::selection {
+  background: var(--signal-on-ink);
+  color: var(--ink);
+}
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+button {
+  font: inherit;
+  color: inherit;
+}
+* {
+  scrollbar-color: var(--line) transparent;
+  scrollbar-width: thin;
+}
+
+/* ------------------------------------------------------------------
+   Type
+   ------------------------------------------------------------------ */
+
+.display {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  font-weight: 500;
+  letter-spacing: -0.022em;
+  line-height: 1.02;
+  text-wrap: balance;
+}
+
+.serif {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  font-weight: 400;
+}
+
+.narrative {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-size: 1.25rem;
+  line-height: 1.45;
+  letter-spacing: -0.004em;
+  text-wrap: pretty;
+}
+@media (min-width: 640px) {
+  .narrative {
+    font-size: 1.375rem;
+    line-height: 1.42;
+  }
+}
+
+.small {
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Run-in heads inside reveal paragraphs. */
+.runin {
+  font-weight: 600;
+  color: var(--fg);
+}
+
+/* ------------------------------------------------------------------
+   Layout
+   ------------------------------------------------------------------ */
+
+.page {
+  width: 100%;
+  max-width: var(--measure);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+@media (min-width: 640px) {
+  .page {
+    --gutter: 32px;
+  }
+}
+
+.rule {
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+
+/* ------------------------------------------------------------------
+   Controls
+   ------------------------------------------------------------------ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 3.25rem;
+  padding: 0.85rem 1.4rem;
+  border-radius: 6px;
+  background: var(--fg);
+  color: var(--bg);
+  font-weight: 600;
+  font-size: 1.0625rem;
+  letter-spacing: -0.005em;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition:
+    transform 160ms var(--ease-out),
+    background-color 160ms var(--ease-out),
+    opacity 160ms var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.btn:hover {
+  background: color-mix(in oklab, var(--fg) 88%, var(--accent));
+}
+.btn:active {
+  transform: translateY(1px) scale(0.995);
+}
+.btn[disabled],
+.btn[aria-disabled="true"] {
+  opacity: 0.5;
+  pointer-events: none;
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--fg);
+  border-color: var(--line);
+}
+.btn-ghost:hover {
+  background: var(--surface-2);
+}
+.btn-accent {
+  background: var(--accent);
+  color: var(--paper);
+}
+.ink .btn-accent {
+  color: var(--ink);
+}
+.btn-accent:hover {
+  background: color-mix(in oklab, var(--accent) 88%, var(--fg));
+}
+.btn-block {
+  width: 100%;
+}
+
+.textlink {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--fg-2);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+  cursor: pointer;
+}
+.textlink:hover {
+  color: var(--fg);
+}
+
+/* Choice rows: not cards. Hairlines, a marker, and the text. */
+.choice {
+  display: grid;
+  grid-template-columns: 2rem 1fr;
+  gap: 0.9rem;
+  align-items: start;
+  width: 100%;
+  padding: 1rem 0.25rem 1rem 0;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--line);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 140ms var(--ease-out);
+  border-radius: 0;
+}
+.choice:last-of-type {
+  border-bottom: 1px solid var(--line);
+}
+.choice:hover:not([disabled]) {
+  background: linear-gradient(to right, var(--surface-2), transparent 70%);
+}
+.choice[disabled] {
+  cursor: default;
+}
+.choice:focus-visible {
+  outline-offset: -2px;
+  border-radius: 4px;
+}
+.choice-marker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin-top: 0.05rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--fg);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  letter-spacing: 0.02em;
+  transition:
+    background-color 160ms var(--ease-out),
+    color 160ms var(--ease-out),
+    transform 220ms var(--ease-out);
+}
+.choice-text {
+  font-size: 1.0625rem;
+  line-height: 1.4;
+  font-weight: 500;
+  color: var(--fg);
+  text-wrap: pretty;
+}
+.choice[data-selected="true"] .choice-marker {
+  background: var(--fg);
+  color: var(--bg);
+  transform: scale(1.08);
+}
+.choice[data-selected="true"] {
+  background: linear-gradient(to right, var(--surface-2), transparent 80%);
+}
+.choice[data-dimmed="true"] .choice-text,
+.choice[data-dimmed="true"] .choice-marker {
+  opacity: 0.38;
+}
+
+/* Progress: five hairline segments. Fills as the round goes on. */
+.meter {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 4px;
+  width: 7.5rem;
+}
+.meter > i {
+  display: block;
+  height: 2px;
+  background: var(--line);
+  border-radius: 1px;
+}
+.meter > i[data-on="true"] {
+  background: var(--fg);
+}
+.meter > i[data-current="true"] {
+  background: var(--accent);
+}
+/* On the narrowest phones the meter alone carries the count (it's labelled for assistive tech). */
+@media (max-width: 359px) {
+  .meter-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .meter {
+    width: 6rem;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Motion. One authored moment: the ink rising over the paper.
+   ------------------------------------------------------------------ */
+
+.ink-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  animation: ink-rise 620ms var(--ease-out) both;
+}
+@keyframes ink-rise {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+.ink-sheet > .page {
+  animation: fade-up 520ms var(--ease-out) 240ms both;
+}
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.enter {
+  animation: fade-up 480ms var(--ease-out) both;
+}
+.enter-delay {
+  animation-delay: 120ms;
+}
+
+.pulse-marker {
+  animation: marker-pop 320ms var(--ease-out);
+}
+@keyframes marker-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.18);
+  }
+  100% {
+    transform: scale(1.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ink-sheet {
+    animation: fade-in 220ms ease-out both;
+  }
+  .ink-sheet > .page,
+  .enter,
+  .pulse-marker {
+    animation: none;
+  }
+  .btn,
+  .choice,
+  .choice-marker {
+    transition: none;
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+/* The fork mark, used in the wordmark and as the empty-state motif. */
+.fork {
+  display: inline-block;
+  vertical-align: -0.12em;
+}
+
+/* Share card composition (the result artefact). */
+.artefact {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 1.5rem 1.25rem;
+  background: var(--bg);
+  box-shadow: 0 12px 32px -16px rgba(0, 0, 0, 0.45);
+}
+@media (min-width: 640px) {
+  .artefact {
+    padding: 2rem 1.75rem;
+  }
+}
+
+/* Simple body lock while the ink sheet is up. */
+body[data-sheet="open"] {
+  overflow: hidden;
+}
+
+/* Hairline list rows used in result screens. */
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.7rem 0;
+  border-top: 1px solid var(--line);
+}
+.row:last-child {
+  border-bottom: 1px solid var(--line);
+}
