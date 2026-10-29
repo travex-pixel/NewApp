@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import { connection } from "next/server";
 import { ArrowRight } from "lucide-react";
 import { Game } from "@/components/game/Game";
 import { Wordmark } from "@/components/Wordmark";
@@ -9,7 +8,6 @@ import { ForkMark } from "@/components/ForkMark";
 import { ChallengeBeacon } from "@/components/ChallengeBeacon";
 import { ShareButton } from "@/components/ShareButton";
 import { decodeChallenge } from "@/lib/game/challenge";
-import { utcDateKey } from "@/lib/game/engine";
 import { SITE_NAME } from "@/lib/site";
 
 type Props = { params: Promise<{ code: string }> };
@@ -46,8 +44,7 @@ async function ChallengeLoader({ params }: Props) {
             That link doesn&rsquo;t go anywhere.
           </h1>
           <p className="mt-4 muted" style={{ maxWidth: "46ch" }}>
-            Challenge links look like <code className="tabular">/c/xxxx</code>. This one may have been cut off when it was pasted. The
-            situation it pointed to is still in the game.
+            Challenge links look like <code className="tabular">/c/xxxx</code>. This one might have been cut off when it was pasted. The situation is still in the game.
           </p>
           <div className="mt-8 grid gap-3" style={{ maxWidth: "24rem" }}>
             <Link href="/play" className="btn btn-block">
@@ -59,17 +56,14 @@ async function ChallengeLoader({ params }: Props) {
     );
   }
 
-  await connection();
-  const dateKey = utcDateKey();
   return (
     <>
       <ChallengeBeacon scenarioId={challenge.scenario.id} valid />
       <Game
         mode="challenge"
-        dateKey={dateKey}
         round={[challenge.scenario]}
         challengerChoice={challenge.choiceId}
-        drawerFooter={
+        pathsFooter={
           <ShareButton scenarioId={challenge.scenario.id} choiceId={challenge.choiceId} label="Send this situation on" className="btn btn-ghost btn-sm" />
         }
       />

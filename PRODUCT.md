@@ -14,7 +14,8 @@ Anyone arriving from a social link on a phone with thirty seconds of patience: f
 
 - Phone first, in-app browsers included. The situation and reveal never scroll at 390×844.
 - No account, no email, no onboarding. The first decision arrives within seconds.
-- Progress is device-local. Today's five is the same for everyone (UTC), so results are comparable in a group chat.
+- Progress is device-local. Today's five changes at local midnight, so friends in the same time zone get the same five and can compare.
+- Australian first: dollars, Australian spelling and everyday Aussie situations. No semicolons or dashes in copy; it should read like a person wrote it.
 - Sharing is real: PNG card via native share, download, copy link, copy text; per-situation challenge links.
 - No LLM at runtime. Authored content and deterministic scoring only.
 

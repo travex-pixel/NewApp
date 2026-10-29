@@ -34,8 +34,8 @@ export const scenarios2: Scenario[] = [
         verdict: "You put both sets of evidence on the table.",
         tag: "Ask for the working",
         gets: ["If his nine years hold something real, you learn it.", "If it's habit, that shows without you saying so."],
-        costs: ["You have to be genuinely open to his answer, not laying a trap."],
-        why: "How sure someone sounds is information about them, not about the decision. Ask what they know.",
+        costs: ["Only works if you actually want his answer."],
+        why: "Sounding sure and being right are different things. Ask what he knows, not how sure he is.",
         scores: { directness: 1, diplomacy: 2, risk: 1 },
       },
       {
@@ -54,7 +54,7 @@ export const scenarios2: Scenario[] = [
     category: "Dating",
     title: "\"Sorry you feel that way\"",
     setup: [
-      "Your partner forgot your sister's birthday dinner. You'd mentioned it three times; you went alone and made excuses. This morning you brought it up, calmly. They said: \"I'm sorry you feel let down. I've had a lot on.\" They're now making coffee.",
+      "Your partner forgot your sister's birthday dinner. You'd mentioned it three times. You went alone and made excuses. This morning you brought it up, calmly. They said: \"I'm sorry you feel let down. I've had a lot on.\" They're now making coffee.",
     ],
     prompt: "What do you do?",
     choices: [
@@ -80,10 +80,10 @@ export const scenarios2: Scenario[] = [
         id: "c",
         text: "\"I don't need 'sorry you're upset'. I need you to get why going alone was rubbish. Can we do that?\"",
         verdict: "You asked for understanding, not the right words.",
-        tag: "Go to the real thing",
+        tag: "Ask for what you need",
         gets: ["Hard to be defensive against.", "If they can see it from your side, the apology sorts itself out."],
         costs: ["Saying a vulnerable thing to someone who just dodged takes steadiness."],
-        why: "A real apology is evidence someone gets it. Skip the evidence and ask for the thing itself.",
+        why: "You wanted them to get it. So ask them to get it, instead of arguing about the wording.",
         scores: { empathy: 2, directness: 1, boundaries: 1 },
       },
       {
@@ -137,7 +137,7 @@ export const scenarios2: Scenario[] = [
       {
         id: "d",
         text: "Wait it out. Three days isn't anything. Don't be that person.",
-        verdict: "Patience, or avoidance in a nicer coat.",
+        verdict: "Could be patience. Could be dodging.",
         tag: "Sit tight",
         gets: ["Most of the time, three days is just three days."],
         costs: ["If something is wrong, you've spent the week narrating it to yourself.", "Only works if you're not checking reply times."],
@@ -174,7 +174,7 @@ export const scenarios2: Scenario[] = [
       },
       {
         id: "c",
-        text: "\"That connects to my point. Let me finish the numbers; they change what Helena's describing.\"",
+        text: "\"That connects to my point. Let me finish the numbers. They change what Helena's describing.\"",
         verdict: "You gave the room a reason to want you back.",
         tag: "Bridge and reclaim",
         gets: ["Her point acknowledged, yours restored, no enemy made.", "Hard to refuse."],
@@ -246,14 +246,14 @@ export const scenarios2: Scenario[] = [
     category: "Friends",
     title: "Your friend's business idea",
     setup: [
-      "Leo's finally shown you the plan he's quitting his job for: an app to find dog walkers, in a town where everyone already knows everyone's dog. He's lit up. He's spent £900 on a logo. \"So. Honestly. What do you think?\"",
+      "Leo's finally shown you the plan he's quitting his job for: an app to find dog walkers, in a town where everyone already knows everyone's dog. He's lit up. He's spent $900 on a logo. \"So. Honestly. What do you think?\"",
     ],
     prompt: "What do you say?",
     choices: [
       {
         id: "a",
         text: "\"I love it. Go for it.\"",
-        verdict: "Enthusiasm that isn't true isn't support.",
+        verdict: "Nice to hear. Not much use to him.",
         tag: "Cheerleader",
         gets: ["He's thrilled tonight."],
         costs: ["In six months he'll remember you said go for it.", "And you'll remember that you knew."],
@@ -294,14 +294,14 @@ export const scenarios2: Scenario[] = [
     category: "Money",
     title: "Splitting the bill",
     setup: [
-      "Birthday dinner, nine of you. You had a main and tap water; you're saving for a deposit. The two opposite had cocktails, starters and a bottle. The bill lands. Someone says, as someone always does: \"Split it nine ways? Easier.\" That's £62. Yours is about £24.",
+      "Birthday dinner, nine of you. You had a main and tap water. You're saving for a deposit. The two opposite had cocktails, entrees and a bottle. The bill lands. Someone says, as someone always does: \"Split it nine ways? Easier.\" That's $62. Yours is about $24.",
     ],
     prompt: "What do you do?",
     choices: [
       {
         id: "a",
-        text: "Pay the £62. It's a birthday. Don't be that person.",
-        verdict: "You paid £38 to avoid a four-second conversation.",
+        text: "Pay the $62. It's a birthday. Don't be that person.",
+        verdict: "You paid $38 to avoid a four-second conversation.",
         tag: "Keep the vibe",
         gets: ["The table stays easy.", "Nobody will ever call you tight."],
         costs: ["It's never just once.", "'Don't be that person' is a rule you only apply to yourself."],
@@ -309,7 +309,7 @@ export const scenarios2: Scenario[] = [
       },
       {
         id: "b",
-        text: "\"I'll just put in for mine, I only had the one thing.\" Put £30 in and move on.",
+        text: "\"I'll just put in for mine, I only had the one thing.\" Put $30 in and move on.",
         verdict: "Four seconds, slightly over, done.",
         tag: "Sort your bit",
         gets: ["You've paid your share plus a bit, which is all a birthday needs.", "Nobody thinks about it again."],
@@ -328,7 +328,7 @@ export const scenarios2: Scenario[] = [
       },
       {
         id: "d",
-        text: "Pay the £62, then message the organiser later that the split wasn't fair.",
+        text: "Pay the $62, then message the organiser later that the split wasn't fair.",
         verdict: "All the awkwardness, none of the benefit.",
         tag: "Pay then complain",
         gets: ["You've said it, somewhere."],
@@ -409,7 +409,7 @@ export const scenarios2: Scenario[] = [
         verdict: "You defused it and gave him somewhere to go.",
         tag: "Gentle redirect",
         gets: ["The claim is softly flagged for everyone reading.", "Uncle gets to talk about his tomatoes, which he prefers anyway."],
-        costs: ["Mum may still boil it.", "It'll happen again; it was always going to."],
+        costs: ["Mum may still boil it.", "It'll happen again. It was always going to."],
         why: "In a family group, being right matters less than being the person people still want to hear from.",
         scores: { diplomacy: 2, empathy: 1 },
       },
@@ -448,7 +448,7 @@ export const scenarios2: Scenario[] = [
         verdict: "You chose comfort and hoped Maya wouldn't notice. She will.",
         tag: "Go with the group",
         gets: ["An easy Friday.", "You're not the one making it weird."],
-        costs: ["Maya sees the photos.", "You've agreed the group can quietly drop people, including you one day."],
+        costs: ["Maya sees the photos.", "You've agreed the group can drop people. That could be you next."],
         scores: { avoidance: 2, empathy: -1, boundaries: -1 },
       },
       {

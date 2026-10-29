@@ -1,26 +1,36 @@
 "use client";
 
-import { setFromIds } from "@/lib/game/engine";
+import { localDateKey, setFromIds, todaysSet } from "@/lib/game/engine";
 import { useHydrated } from "@/lib/game/progress-store";
 import { loadSession } from "@/lib/game/session-store";
 import { Game } from "./Game";
+import { GameHeader } from "./GameHeader";
 
 /**
- * The server provides today's five so the first situation is in the HTML.
- * After hydration, if this tab has a round from today in progress (a
- * refresh), the game remounts with that round restored. A round from a
- * previous day is discarded: today's five is today's five.
+ * Today's five depends on the player's own date, so it's chosen in the
+ * browser. A refresh mid-round restores that round. A round from a previous
+ * day is discarded: today's five is today's five.
  */
-export function PlayGame({ dateKey, roundIds }: { dateKey: string; roundIds: string[] }) {
+export function PlayGame() {
   const hydrated = useHydrated();
-  const today = setFromIds(roundIds) ?? [];
 
-  if (hydrated) {
-    const session = loadSession();
-    if (session && session.dateKey === dateKey) {
-      const restored = setFromIds(session.roundIds);
-      if (restored) return <Game key="resume" mode="round" dateKey={dateKey} round={restored} resume={session} />;
-    }
+  if (!hydrated) {
+    return (
+      <div className="shell grain" aria-busy="true">
+        <header className="shell-head">
+          <GameHeader />
+        </header>
+        <div className="shell-main" />
+        <div />
+      </div>
+    );
   }
-  return <Game key="fresh" mode="round" dateKey={dateKey} round={today} roundIndex={0} />;
+
+  const dateKey = localDateKey();
+  const session = loadSession();
+  if (session && session.dateKey === dateKey) {
+    const restored = setFromIds(session.roundIds);
+    if (restored) return <Game key="resume" mode="round" dateKey={dateKey} round={restored} resume={session} />;
+  }
+  return <Game key={`fresh-${dateKey}`} mode="round" dateKey={dateKey} round={todaysSet(dateKey)} roundIndex={0} />;
 }

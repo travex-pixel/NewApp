@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { DIMENSIONS, LIMITS, SCENARIOS } from "@/lib/content";
+import { ARCHETYPES } from "@/lib/game/archetypes";
 
 describe("scenario library", () => {
   it("has at least 20 scenarios with unique, stable ids", () => {
@@ -61,5 +62,18 @@ describe("scenario library", () => {
   it("every category appears at least once", () => {
     const cats = new Set(SCENARIOS.map((s) => s.category));
     expect(cats.size).toBeGreaterThanOrEqual(7);
+  });
+
+  it("reads like a person wrote it: no semicolons, no dashes, Australian dollars", () => {
+    const strings: string[] = [];
+    for (const s of SCENARIOS) {
+      strings.push(s.title, s.prompt, ...s.setup);
+      for (const c of s.choices) strings.push(c.text, c.verdict, c.tag ?? "", c.why ?? "", ...c.gets, ...c.costs);
+    }
+    for (const a of Object.values(ARCHETYPES)) strings.push(a.name, a.headline, a.description, ...a.strengths, ...a.watchOuts);
+    for (const text of strings) {
+      expect(text, text).not.toMatch(/[;\u2014\u2013£€]/);
+      expect(text, text).not.toMatch(/\b(genuinely|delve|tapestry|testament|navigate|journey|unlock|level up)\b/i);
+    }
   });
 });

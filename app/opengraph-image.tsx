@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { loadOgFonts, OgFrame } from "@/lib/og";
 import { TAGLINE } from "@/lib/site";
 
-export const alt = "Instinct — Think you read people well?";
+export const alt = "Instinct: think you read people well?";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

@@ -4,11 +4,12 @@ Five everyday social situations. Five instinctive decisions. One surprisingly re
 
 A mobile-first social judgement game built with Next.js 16 (App Router, Cache Components), TypeScript, Tailwind CSS 4 and Motion, deployed on Vercel. No accounts, no database, no AI at runtime.
 
-- `/` — the hook: headline, one sentence, one button.
-- `/play` — today's five (same for everyone, resets at midnight UTC) → reveal after each → your social aura. Then another five.
-- `/r/<archetype>` — a shareable result page with its own social preview; `/r/<archetype>/card` (4:5) and `/card-square` are the PNG cards.
-- `/c/<code>` — a challenge link for one situation; the sender's answer stays hidden until the recipient answers.
-- `/about` — what it is, what it isn't, what it keeps.
+- `/`: the hook. Headline, one sentence, one button, and a peek at today's five.
+- `/play`: today's five (a new set at the player's local midnight) then a reveal after each, then your social aura. Then another five.
+- `/r/<archetype>`: a shareable result page with its own social preview; `/r/<archetype>/card` (4:5) and `/card-square` are the PNG cards.
+- `/c/<code>`: a challenge link for one situation; the sender's answer stays hidden until the recipient answers.
+- `/about`: what it is, what it isn't, what it keeps.
+- `/palettes`: preview the three colour palettes on your own phone (not linked from the game).
 
 ## Local setup
 

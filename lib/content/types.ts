@@ -13,7 +13,7 @@ export type Category =
   | "Group chat"
   | "Dating"
   | "Neighbours"
-  | "Flatmates"
+  | "Housemates"
   | "Strangers"
   | "Money";
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { SCENARIOS, type Choice, type Dimension } from "@/lib/content";
-import { ARCHETYPES, ARCHETYPE_IDS, archetypeFor, auraFor, patternSummary, totalsFor, type Totals } from "@/lib/game/archetypes";
+import { ARCHETYPES, ARCHETYPE_IDS, archetypeFor, auraFor, nextRoundTip, patternSummary, totalsFor, type Totals } from "@/lib/game/archetypes";
 import { todaysSet } from "@/lib/game/engine";
 
 const IDS: Choice["id"][] = ["a", "b", "c", "d"];
@@ -14,7 +14,8 @@ function leanAnswers(dim: Dimension, scenarios = todaysSet("2026-10-29")) {
 }
 
 describe("archetypes", () => {
-  it("every archetype has complete, distinct copy", () => {
+  it("there are at least 20 archetypes, each with complete, distinct copy", () => {
+    expect(ARCHETYPE_IDS.length).toBeGreaterThanOrEqual(20);
     const names = new Set<string>();
     for (const id of ARCHETYPE_IDS) {
       const a = ARCHETYPES[id];
@@ -35,15 +36,15 @@ describe("archetypes", () => {
   });
 
   it("maps consistent leans to the archetype you'd expect", () => {
-    expect(auraFor(leanAnswers("avoidance")).archetype.id).toMatch(/escape-artist|people-pleaser|table-diplomat/);
-    expect(auraFor(leanAnswers("directness")).archetype.id).toMatch(/truth-teller|velvet-hammer|social-risk-taker/);
-    expect(auraFor(leanAnswers("boundaries")).archetype.id).toMatch(/boundary-architect|velvet-hammer/);
-    expect(auraFor(leanAnswers("empathy")).archetype.id).toMatch(/accidental-therapist|chaos-mediator|velvet-hammer|people-pleaser/);
+    expect(auraFor(leanAnswers("avoidance")).archetype.id).toMatch(/escape-artist|people-pleaser|smooth-operator|quiet-strategist|note-writer|plot-twist/);
+    expect(auraFor(leanAnswers("directness")).archetype.id).toMatch(/truth-teller|velvet-hammer|live-wire|plain-speaker|honest-hugger/);
+    expect(auraFor(leanAnswers("boundaries")).archetype.id).toMatch(/boundary-architect|plain-speaker|velvet-rope|kind-no|maverick|quiet-strategist/);
+    expect(auraFor(leanAnswers("empathy")).archetype.id).toMatch(/accidental-therapist|honest-hugger|room-reader|kind-no|people-pleaser|big-hearted-gambler/);
   });
 
   it("every archetype is reachable from real daily sets", () => {
     const seen = new Set<string>();
-    const days = ["2026-10-29", "2026-10-30", "2026-10-31", "2026-11-01", "2026-11-02", "2026-11-03", "2026-11-04", "2026-11-05"];
+    const days = Array.from({ length: 30 }, (_, i) => new Date(Date.UTC(2026, 9, 29 + i)).toISOString().slice(0, 10));
     for (const d of days) {
       const set = todaysSet(d);
       for (let n = 0; n < 1024; n++) {
@@ -62,8 +63,8 @@ describe("archetypes", () => {
       const id = auraFor(answers).archetype.id;
       counts[id] = (counts[id] ?? 0) + 1;
     }
-    expect(Math.max(...Object.values(counts))).toBeLessThan(1024 * 0.4);
-    expect(Object.keys(counts).length).toBeGreaterThanOrEqual(6);
+    expect(Math.max(...Object.values(counts))).toBeLessThan(1024 * 0.3);
+    expect(Object.keys(counts).length).toBeGreaterThanOrEqual(12);
   });
 
   it("flat profiles are the Overthinker; unknown answers are ignored", () => {
@@ -80,6 +81,17 @@ describe("archetypes", () => {
         const t = totalsFor([{ scenarioId: s.id, choiceId: c.id }]);
         expect(Object.values(t).some((v) => v !== 0)).toBe(true);
       }
+    }
+  });
+});
+
+describe("next round tip", () => {
+  it("always gives a tip and names a dimension", () => {
+    const set = todaysSet("2026-10-29");
+    for (let n = 0; n < 1024; n += 37) {
+      const answers = set.map((s, i) => ({ scenarioId: s.id, choiceId: IDS[Math.floor(n / 4 ** i) % 4] }));
+      const tip = nextRoundTip(totalsFor(answers));
+      expect(tip.tip.length).toBeGreaterThan(20);
     }
   });
 });

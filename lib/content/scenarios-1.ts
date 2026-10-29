@@ -27,7 +27,7 @@ export const scenarios1: Scenario[] = [
         tag: "Line in the sand",
         gets: ["Dan won't do it again tonight.", "You didn't pretend it was fine."],
         costs: ["The table goes quiet and the story becomes 'the moment you made it awkward'.", "Dan defends himself instead of hearing you."],
-        why: "A correction with an audience becomes a performance for both of you. The point lands; the evening doesn't recover.",
+        why: "A correction with an audience becomes a performance for both of you. The point lands. The evening doesn't recover.",
         scores: { directness: 2, risk: 1, diplomacy: -1 },
       },
       {
@@ -42,7 +42,7 @@ export const scenarios1: Scenario[] = [
       },
       {
         id: "d",
-        text: "Fire one back. \"Says the man who cried at a car advert.\"",
+        text: "Fire one back. \"Says the man who cried at a car ad.\"",
         verdict: "You won the round. You also agreed to the game.",
         tag: "Counter-punch",
         gets: ["Big laugh, and you look unbothered.", "Dan can't claim you can't take a joke."],
@@ -75,7 +75,7 @@ export const scenarios1: Scenario[] = [
         verdict: "You joined the story, not the circle.",
         tag: "Door through the topic",
         gets: ["You're in on their terms, about their thing.", "Someone retells it, and that introduces you for free."],
-        costs: ["Needs a bit of front.", "A genuinely closed group will show you in ten seconds."],
+        costs: ["Needs a bit of front.", "If they really don't want company, you'll know in ten seconds."],
         why: "People let you into a conversation far more readily than into a circle. Ask about the thing they're already enjoying.",
         scores: { risk: 1, diplomacy: 1, directness: 1 },
       },
@@ -93,7 +93,7 @@ export const scenarios1: Scenario[] = [
         text: "Go and help in the kitchen until the host can introduce you.",
         verdict: "You found a job to do instead of a person to meet.",
         tag: "Useful retreat",
-        gets: ["The host will love you for it.", "Comfortable and genuinely helpful."],
+        gets: ["The host will love you for it.", "Comfy, and you're actually useful."],
         costs: ["You've spent the easy part of the night in the one room with nobody to meet.", "Later circles are harder to break into."],
         scores: { avoidance: 1, empathy: 1, risk: -1 },
       },
@@ -149,10 +149,10 @@ export const scenarios1: Scenario[] = [
   },
   {
     id: "gone-quiet",
-    category: "Flatmates",
+    category: "Housemates",
     title: "Gone quiet",
     setup: [
-      "You and your flatmate Ana had a short, sharp disagreement on Tuesday about the heating. It's Thursday. She's been polite, brief and in her room a lot. \"Fine, thanks.\" You're not sure it's even about Tuesday.",
+      "You and your housemate Ana had a short, sharp disagreement on Tuesday about the heating. It's Thursday. She's been polite, brief and in her room a lot. \"Fine, thanks.\" You're not sure it's even about Tuesday.",
     ],
     prompt: "What do you do?",
     choices: [
@@ -189,7 +189,7 @@ export const scenarios1: Scenario[] = [
         text: "Be extra warm and chatty to show there are no hard feelings.",
         verdict: "You performed normal. She noticed.",
         tag: "Cheerful fix",
-        gets: ["The flat feels lighter for an evening."],
+        gets: ["The house feels lighter for an evening."],
         costs: ["Nothing is said, nothing is resolved.", "Now you're both acting, and she's wondering why."],
         scores: { avoidance: 1, diplomacy: 1, directness: -1 },
       },
@@ -200,7 +200,7 @@ export const scenarios1: Scenario[] = [
     category: "Family",
     title: "The loan you already said no to",
     setup: [
-      "Your brother asked to borrow £400 last month. You said no, clearly: the last two never came back. Tonight: \"I know you said no but this is different, it's for the car, I literally can't get to work. I'll pay you back on the 28th, I promise.\"",
+      "Your brother asked to borrow $500 last month. You said no, clearly: the last two never came back. Tonight: \"I know you said no but this is different, it's for the car, I literally can't get to work. I'll pay you back on the 28th, I promise.\"",
     ],
     prompt: "What do you reply?",
     choices: [
@@ -283,7 +283,7 @@ export const scenarios1: Scenario[] = [
       {
         id: "d",
         text: "Leave it on read until tomorrow.",
-        verdict: "Silence is a decision too. Chloe deals with it.",
+        verdict: "Leaving it on read is still an answer.",
         tag: "Ghost the planner",
         gets: ["You don't have to decide tonight."],
         costs: ["Chloe has to chase you.", "Your tiredness is now her admin."],
@@ -344,7 +344,7 @@ export const scenarios1: Scenario[] = [
     category: "Money",
     title: "The number on the table",
     setup: [
-      "You're selling your old bike. You listed it at £350 because a similar one went for that. A buyer has kicked the tyres and said: \"I'll give you £250 cash now.\" He seems keen. You've had no other offers. It's been up two days.",
+      "You're selling your old bike. You listed it at $350 because a similar one went for that. A buyer has kicked the tyres and said: \"I'll give you $250 cash now.\" He seems keen. You've had no other offers. It's been up two days.",
     ],
     prompt: "What do you say?",
     choices: [
@@ -353,13 +353,13 @@ export const scenarios1: Scenario[] = [
         text: "\"Done.\" A bird in the hand.",
         verdict: "You took the first number he said.",
         tag: "Quick close",
-        gets: ["£250 and the bike's gone today.", "No haggling, no awkward silence."],
-        costs: ["Buyers who open at £250 are usually ready for £300.", "You treated your uncertainty as his advantage."],
+        gets: ["$250 and the bike's gone today.", "No haggling, no awkward silence."],
+        costs: ["Buyers who open at $250 are usually ready for $300.", "You treated your uncertainty as his advantage."],
         scores: { avoidance: 1, risk: -1, boundaries: -1 },
       },
       {
         id: "b",
-        text: "\"It's £350. That's the price.\"",
+        text: "\"It's $350. That's the price.\"",
         verdict: "You held a line you half made up.",
         tag: "Firm, maybe bluffing",
         gets: ["He might just pay it.", "You look like someone who knows what things are worth."],
@@ -368,7 +368,7 @@ export const scenarios1: Scenario[] = [
       },
       {
         id: "c",
-        text: "\"What's making you say £250? What have you seen them go for?\"",
+        text: "\"What's making you say $250? What have you seen them go for?\"",
         verdict: "You asked for his reasoning, not just his number.",
         tag: "Show your working",
         gets: ["If he has a real reason, you learn something.", "If he hasn't, he usually moves just to end the silence."],
@@ -378,7 +378,7 @@ export const scenarios1: Scenario[] = [
       },
       {
         id: "d",
-        text: "\"Meet me in the middle, £300?\"",
+        text: "\"Meet me in the middle, $300?\"",
         verdict: "Fair-sounding, and anchored on his number.",
         tag: "Split it",
         gets: ["Probably closes, and everyone feels reasonable."],
@@ -417,11 +417,11 @@ export const scenarios1: Scenario[] = [
       },
       {
         id: "c",
-        text: "\"That's a bit personal for the starters, isn't it?\"",
+        text: "\"That's a bit personal for the entrees, isn't it?\"",
         verdict: "True, and now the table is tense.",
         tag: "Name the overstep",
         gets: ["She might think twice next time.", "The cousins silently cheer."],
-        costs: ["Auntie is hurt, mum is mortified, and it's only the starters.", "You've become the story of the wedding."],
+        costs: ["Auntie is hurt, mum is mortified, and it's only the entrees.", "You've become the story of the wedding."],
         scores: { directness: 2, boundaries: 1, diplomacy: -2 },
       },
       {
@@ -465,10 +465,10 @@ export const scenarios1: Scenario[] = [
       },
       {
         id: "c",
-        text: "Skip the group. Ring mum: \"I know you're excited. I needed that one to be mine.\"",
+        text: "Skip the group. Call mum: \"I know you're excited. I needed that one to be mine.\"",
         verdict: "You went straight to the person, not the chat.",
         tag: "Direct line",
-        gets: ["Mum gets the message with her dignity intact.", "You've said the real thing: it was yours to tell."],
+        gets: ["Mum gets the message with her dignity intact.", "You've told her what actually stung: it was your news."],
         costs: ["The group stays confused about whether it's real.", "Mum may cry a bit. She'll also remember."],
         scores: { directness: 1, empathy: 2, boundaries: 1 },
       },

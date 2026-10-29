@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { AnalyticsProvider } from "@/components/AnalyticsProvider";
+import { PALETTE_KEY, PALETTES } from "@/lib/palettes";
 import { SITE_NAME, SITE_URL, TAGLINE } from "@/lib/site";
 import "./globals.css";
 
@@ -26,14 +27,15 @@ const instrument = localFont({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} — Think you read people well?`,
+    default: `${SITE_NAME} · Think you read people well?`,
     template: `%s · ${SITE_NAME}`,
   },
   description: TAGLINE,
   openGraph: {
     siteName: SITE_NAME,
     type: "website",
-    title: `${SITE_NAME} — Think you read people well?`,
+    locale: "en_AU",
+    title: `${SITE_NAME} · Think you read people well?`,
     description: TAGLINE,
   },
   twitter: {
@@ -42,15 +44,23 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f3eee4",
+  themeColor: "#f3efe6",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
 };
 
+// Applies a saved palette before the first paint, so there's no flash.
+const paletteScript = `try{var p=localStorage.getItem(${JSON.stringify(PALETTE_KEY)});if(${JSON.stringify(
+  PALETTES.map((x) => x.id),
+)}.indexOf(p)>-1)document.documentElement.dataset.palette=p}catch(e){}`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-GB" className={`${fraunces.variable} ${instrument.variable} h-full`}>
+    <html lang="en-AU" className={`${fraunces.variable} ${instrument.variable} h-full`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: paletteScript }} />
+      </head>
       <body className="min-h-full flex flex-col">
         {children}
         <AnalyticsProvider />

@@ -4,38 +4,40 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import type { Choice, Scenario } from "@/lib/content";
-import { nextSet, type PlayRecord } from "@/lib/game/engine";
+import { localDateKey, nextSet, type PlayRecord } from "@/lib/game/engine";
 import { auraFor } from "@/lib/game/archetypes";
 import { commitProgress, readProgress } from "@/lib/game/progress-store";
 import { saveSession, type RoundSession } from "@/lib/game/session-store";
 import { track, trackOnce } from "@/lib/analytics";
 import type { PlayMode } from "@/lib/analytics/events";
+import { buzz, play } from "@/lib/sound";
 import { RevealScreen } from "./RevealScreen";
-import { ResultScreen } from "./ResultScreen";
+import { ResultScreen, type Pick } from "./ResultScreen";
 import { SituationScreen } from "./SituationScreen";
 
 type Phase = "situation" | "reveal" | "result";
 
 export interface GameProps {
   mode: PlayMode;
-  dateKey: string;
   round: Scenario[];
+  /** round mode: the local date today's five belongs to. */
+  dateKey?: string;
   /** round mode: 0 = today's five, 1+ = another five. */
   roundIndex?: number;
   /** round mode: a round in progress in this tab, restored after a refresh. */
   resume?: RoundSession;
   /** challenge mode: what the sender chose, hidden until answered. */
   challengerChoice?: Choice["id"];
-  /** challenge mode: something to put in the drawer (e.g. a send-back link). */
-  drawerFooter?: React.ReactNode;
+  /** challenge mode: extra content for the "other answers" sheet. */
+  pathsFooter?: React.ReactNode;
   headRight?: React.ReactNode;
 }
 
-const SELECT_DELAY_MS = 380;
+const SELECT_DELAY_MS = 420;
 const EASE = [0.16, 1, 0.3, 1] as const;
 
 export function Game(props: GameProps) {
-  const { mode, dateKey } = props;
+  const { mode } = props;
   const router = useRouter();
   const reduce = useReducedMotion();
 
@@ -48,6 +50,7 @@ export function Game(props: GameProps) {
     props.resume?.finished ? "result" : props.resume?.records[props.resume.index] ? "reveal" : "situation",
   );
   const [storageOk, setStorageOk] = useState(true);
+  const [foundBefore, setFoundBefore] = useState<Set<string> | null>(null);
   const timer = useRef<number | null>(null);
   const lock = useRef(false);
 
@@ -55,8 +58,8 @@ export function Game(props: GameProps) {
   const total = round.length;
   const isLast = index + 1 >= total;
   const chosen = selected ? scenario?.choices.find((c) => c.id === selected) : undefined;
+  const dateKey = props.dateKey ?? "";
 
-  // The page never scrolls while the game is up.
   useEffect(() => {
     document.body.dataset.game = "on";
     return () => {
@@ -64,11 +67,8 @@ export function Game(props: GameProps) {
     };
   }, []);
 
-  // Persist the round in this tab so a refresh resumes it.
   useEffect(() => {
-    if (mode !== "round") return;
-    // An untouched first round has nothing to restore, and the pre-hydration
-    // instance must not overwrite a session the resume logic is about to read.
+    if (mode !== "round" || !dateKey) return;
     if (records.length === 0 && index === 0 && roundIndex === 0 && phase === "situation") return;
     saveSession({ dateKey, roundIndex, roundIds: round.map((s) => s.id), index, records, finished: phase === "result" });
   }, [mode, dateKey, roundIndex, round, index, records, phase]);
@@ -97,11 +97,12 @@ export function Game(props: GameProps) {
       if (!choice) return;
       lock.current = true;
       setSelected(choiceId);
+      play.select();
+      buzz(8);
 
       const record: PlayRecord = { scenarioId: scenario.id, choiceId, at: Date.now() };
       const newRecords = [...records, record];
       setRecords(newRecords);
-
       const base = readProgress();
       setStorageOk(commitProgress({ ...base, plays: [...base.plays, record] }));
 
@@ -113,6 +114,7 @@ export function Game(props: GameProps) {
       timer.current = window.setTimeout(
         () => {
           setPhase("reveal");
+          play.reveal();
           lock.current = false;
         },
         reduce ? 120 : SELECT_DELAY_MS,
@@ -122,6 +124,15 @@ export function Game(props: GameProps) {
   );
 
   const aura = useMemo(() => (phase === "result" ? auraFor(records) : null), [phase, records]);
+  const picks = useMemo<Pick[]>(
+    () =>
+      records.map((r) => {
+        const s = round.find((x) => x.id === r.scenarioId);
+        const c = s?.choices.find((x) => x.id === r.choiceId);
+        return { title: s?.title ?? "", tag: c?.tag ?? c?.id.toUpperCase() ?? "" };
+      }),
+    [records, round],
+  );
 
   const advance = useCallback(() => {
     if (mode === "challenge") {
@@ -129,6 +140,7 @@ export function Game(props: GameProps) {
       return;
     }
     if (!isLast) {
+      play.next();
       setIndex((i) => i + 1);
       setSelected(null);
       setPhase("situation");
@@ -136,15 +148,19 @@ export function Game(props: GameProps) {
     }
     const { archetype } = auraFor(records);
     const base = readProgress();
-    setStorageOk(commitProgress({ ...base, results: [...base.results, { archetypeId: archetype.id, dateKey, at: Date.now() }] }));
-    track("round_completed", { archetype_id: archetype.id, round_index: roundIndex, date: dateKey });
+    setFoundBefore(new Set(base.results.map((r) => r.archetypeId)));
+    setStorageOk(
+      commitProgress({ ...base, results: [...base.results, { archetypeId: archetype.id, dateKey: dateKey || localDateKey(), at: Date.now() }] }),
+    );
+    track("round_completed", { archetype_id: archetype.id, round_index: roundIndex, date: dateKey || localDateKey() });
     setPhase("result");
   }, [mode, isLast, records, dateKey, roundIndex, router]);
 
   const playAgain = useCallback(() => {
     const played = new Set([...readProgress().plays.map((p) => p.scenarioId), ...round.map((s) => s.id)]);
     const nextIndex = roundIndex + 1;
-    setRound(nextSet(dateKey, nextIndex, played));
+    play.next();
+    setRound(nextSet(dateKey || localDateKey(), nextIndex, played));
     setRoundIndex(nextIndex);
     setIndex(0);
     setRecords([]);
@@ -156,31 +172,34 @@ export function Game(props: GameProps) {
   if (!scenario) return null;
 
   const ctaLabel = mode === "challenge" ? "Play today's 5" : isLast ? "Reveal my social aura" : "Next situation";
-  const headRight =
-    props.headRight ??
-    (mode === "challenge" ? <span className="small muted">A challenge</span> : undefined);
+  const headRight = props.headRight ?? (mode === "challenge" ? <span className="small muted">A challenge</span> : undefined);
 
   const wipe = reduce
     ? { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 }, transition: { duration: 0.2 } }
     : {
-        initial: { clipPath: "inset(100% 0 0 0)" },
-        animate: { clipPath: "inset(0 0 0 0)" },
+        initial: { clipPath: "inset(100% 0 0 0 round 28px 28px 0 0)" },
+        animate: { clipPath: "inset(0% 0 0 0 round 0px 0px 0 0)" },
         exit: { opacity: 0 },
-        transition: { duration: 0.55, ease: EASE },
+        transition: { duration: 0.6, ease: EASE },
       };
-  const fade = { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 1 }, transition: { duration: 0.25 } };
+  const deal = reduce
+    ? { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 1 }, transition: { duration: 0.2 } }
+    : { initial: { opacity: 0, x: 36 }, animate: { opacity: 1, x: 0 }, exit: { opacity: 1 }, transition: { duration: 0.45, ease: EASE } };
+
+  const found = new Set([...(foundBefore ?? []), ...(aura ? [aura.archetype.id] : [])]);
+  const isNew = Boolean(aura && foundBefore && !foundBefore.has(aura.archetype.id));
 
   return (
     <AnimatePresence mode="sync" initial={false}>
       {phase === "situation" ? (
-        <motion.div key={`situation-${roundIndex}-${index}`} {...fade} style={{ position: "fixed", inset: 0, zIndex: 10 }}>
+        <motion.div key={`situation-${roundIndex}-${index}`} {...deal} style={{ position: "fixed", inset: 0, zIndex: 10 }}>
           <SituationScreen
             scenario={scenario}
             index={index}
             total={total}
             selected={selected}
             onSelect={select}
-            note={mode === "challenge" ? "Someone sent you this. Their answer is hidden until you've given yours." : undefined}
+            note={mode === "challenge" ? "Someone sent you this. Their answer stays hidden until you pick yours." : undefined}
             headRight={headRight}
           />
         </motion.div>
@@ -196,8 +215,8 @@ export function Game(props: GameProps) {
             ctaLabel={ctaLabel}
             onNext={advance}
             challengerChoice={mode === "challenge" && props.challengerChoice ? scenario.choices.find((c) => c.id === props.challengerChoice) : undefined}
-            onDrawerOpen={() => track("drawer_opened", { scenario_id: scenario.id, mode })}
-            drawerFooter={props.drawerFooter}
+            onPathsOpen={() => track("drawer_opened", { scenario_id: scenario.id, mode })}
+            pathsFooter={props.pathsFooter}
             headRight={headRight}
           />
         </motion.div>
@@ -205,7 +224,16 @@ export function Game(props: GameProps) {
 
       {phase === "result" && aura ? (
         <motion.div key={`result-${roundIndex}`} {...wipe} style={{ position: "fixed", inset: 0, zIndex: 30 }}>
-          <ResultScreen archetype={aura.archetype} totals={aura.totals} onPlayAgain={playAgain} roundIndex={roundIndex} storageOk={storageOk} />
+          <ResultScreen
+            archetype={aura.archetype}
+            totals={aura.totals}
+            picks={picks}
+            found={found}
+            isNew={isNew}
+            onPlayAgain={playAgain}
+            roundIndex={roundIndex}
+            storageOk={storageOk}
+          />
         </motion.div>
       ) : null}
     </AnimatePresence>

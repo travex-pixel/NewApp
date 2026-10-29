@@ -6,6 +6,14 @@ An independent magazine about human behaviour, crossed with a very well-made pho
 
 Motif: the fork. One path becoming two, drawn horizontally so it reads as a road splitting, never a letter. The wordmark, the favicon, the social image, and the six archetype marks (split, merge, straight, loop, pause, leap) are all built from it with the same stroke.
 
+## Palettes
+
+Three palettes share one set of tokens, switched with `<html data-palette>`: **Espresso & Olive** (default), **Eucalyptus & Clay** and **Midnight & Marigold**. Preview them on a phone at `/palettes`. The choice is saved locally and applied before first paint by an inline script in the layout. The exported PNG card always uses Espresso until a palette is chosen as the default.
+
+## Depth
+
+Paper has a faint grain. Answer options are raised cards (`--surface`, `--shadow-md`), so they sit on the page rather than in it. Buttons carry `--shadow-md`. The aura card uses `--shadow-xl`, tilts under the finger and catches a single sheen when it arrives.
+
 ## Tokens (`app/globals.css`)
 
 | Token | Paper | Ink |
@@ -28,7 +36,7 @@ Switch worlds with the `.ink` class. Radii: 6 / 12 / 18px. No other colours, no 
 
 ## Layout: the shell
 
-Every game screen is a fixed, full-viewport grid: `auto / minmax(0,1fr) / auto`. Header (wordmark + progress), main (centred when there's room, scrolls internally only when the device is genuinely too short), footer (one full-width CTA with safe-area padding). The page itself never scrolls during play; `body[data-game="on"]` locks it. At 390×844 the situation and the reveal fit with zero overflow; the test suite and `qa.mjs` check this.
+Every game screen is a fixed, full-viewport grid. The answer options live in the footer tray, so they are always in reach and the situation sits above them. Extra detail (the other answers, what an aura means, the collection) opens in a bottom sheet instead of growing the page. The grid is: `auto / minmax(0,1fr) / auto`. Header (wordmark + progress), main (centred when there's room, scrolls internally only when the device is genuinely too short), footer (one full-width CTA with safe-area padding). The page itself never scrolls during play; `body[data-game="on"]` locks it. At 390×844 the situation and the reveal fit with zero overflow; the test suite and `qa.mjs` check this.
 
 Desktop is the same column at 34rem with a faint olive wash, not a stretched phone.
 
@@ -39,6 +47,10 @@ Desktop is the same column at 34rem with a faint olive wash, not a stretched pho
 - `.marks` progress: five 4px marks, done olive, current terracotta and wider.
 - `.drawer-toggle` + `.drawer-body`: the "other paths" accordion, bounded to `min(28dvh, 300px)` with internal scroll so the CTA never moves.
 - `.aura-card`: the 4:5 collectible. Paper, inner hairline frame, motif, name, headline, terracotta bar, host.
+
+## Sound and haptics
+
+Synthesised with Web Audio (`lib/sound.ts`), no files. A soft two-note pick, a swoosh and low bell on the reveal, a page-turn between situations, ticks while your five are read back, and a rising chord when the aura lands. Quiet by default, follows the iPhone silent switch, and the speaker button in the header turns it off for good. Android gets a short vibration on pick and on the aura.
 
 ## Motion
 

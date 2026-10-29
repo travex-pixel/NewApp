@@ -1,13 +1,15 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Layers } from "lucide-react";
 import type { Choice, Scenario } from "@/lib/content";
-import { Wordmark } from "@/components/Wordmark";
-import { AlternativePaths } from "./AlternativePaths";
+import { DialChips } from "./DialChips";
+import { GameHeader } from "./GameHeader";
 import { GameShell } from "./GameShell";
+import { OtherPaths } from "./OtherPaths";
 import { Progress } from "./Progress";
+import { Sheet } from "./Sheet";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -19,8 +21,8 @@ export function RevealScreen({
   ctaLabel,
   onNext,
   challengerChoice,
-  onDrawerOpen,
-  drawerFooter,
+  onPathsOpen,
+  pathsFooter,
   headRight,
 }: {
   scenario: Scenario;
@@ -29,17 +31,16 @@ export function RevealScreen({
   total: number;
   ctaLabel: string;
   onNext: () => void;
-  /** Challenge mode: what the sender picked, shown only now. */
   challengerChoice?: Choice;
-  onDrawerOpen?: () => void;
-  drawerFooter?: React.ReactNode;
+  onPathsOpen?: () => void;
+  pathsFooter?: React.ReactNode;
   headRight?: React.ReactNode;
 }) {
   const reduce = useReducedMotion();
+  const [paths, setPaths] = useState(false);
   const others = scenario.choices.filter((c) => c.id !== choice.id);
   const headingRef = useRef<HTMLHeadingElement | null>(null);
 
-  // Move focus to the verdict for screen readers, without scrolling.
   useEffect(() => {
     const t = window.setTimeout(() => headingRef.current?.focus({ preventScroll: true }), reduce ? 50 : 450);
     return () => window.clearTimeout(t);
@@ -49,31 +50,51 @@ export function RevealScreen({
     reduce
       ? {}
       : {
-          initial: { opacity: 0, y: 10 },
+          initial: { opacity: 0, y: 12 },
           animate: { opacity: 1, y: 0 },
-          transition: { duration: 0.45, delay, ease: EASE },
+          transition: { duration: 0.5, delay, ease: EASE },
         };
 
   return (
     <GameShell
       theme="ink"
-      head={
-        <>
-          <Wordmark />
-          {headRight ?? <Progress current={index} total={total} />}
-        </>
-      }
+      head={<GameHeader right={headRight ?? <Progress current={index} total={total} />} />}
       foot={
-        <motion.button type="button" className="btn btn-block" onClick={onNext} {...item(0.55)}>
-          {ctaLabel} <ArrowRight size={18} aria-hidden="true" />
-        </motion.button>
+        <>
+          <motion.button
+            type="button"
+            className="btn btn-ghost btn-sm btn-block"
+            onClick={() => {
+              setPaths(true);
+              onPathsOpen?.();
+            }}
+            {...item(0.5)}
+          >
+            <Layers size={16} aria-hidden="true" /> See how the other answers play out
+          </motion.button>
+          <motion.button type="button" className="btn btn-block" onClick={onNext} {...item(0.6)}>
+            {ctaLabel} <ArrowRight size={18} aria-hidden="true" />
+          </motion.button>
+        </>
       }
       aria-label="What happens"
     >
       <div className="centred">
-        <motion.div {...item(0.12)}>
+        <motion.div {...item(0.1)}>
           <p className="small muted">You chose {choice.id.toUpperCase()}</p>
-          <p className="serif mt-1" style={{ fontSize: "1.0625rem", lineHeight: 1.35, fontStyle: "italic", color: "var(--fg-2)", textWrap: "pretty" }}>
+          <p
+            className={`serif mt-1 reveal-echo ${challengerChoice ? "hidden" : ""}`}
+            style={{
+              fontSize: "1rem",
+              lineHeight: 1.35,
+              fontStyle: "italic",
+              color: "var(--fg-2)",
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+            }}
+          >
             {choice.text}
           </p>
         </motion.div>
@@ -81,60 +102,60 @@ export function RevealScreen({
         <motion.h2
           ref={headingRef}
           tabIndex={-1}
-          className="display mt-4"
-          style={{ fontSize: "clamp(1.5rem, 6.4vw, 1.9rem)", outline: "none" }}
-          {...item(0.22)}
+          className="display fit-verdict mt-3"
+          style={{ outline: "none" }}
+          initial={reduce ? false : { opacity: 0, y: 16, filter: "blur(6px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          transition={{ duration: 0.6, delay: reduce ? 0 : 0.2, ease: EASE }}
         >
           {choice.verdict}
         </motion.h2>
-        {choice.tag ? (
-          <motion.p className="small accent mt-2 font-semibold" {...item(0.28)}>
-            {choice.tag}
-          </motion.p>
-        ) : null}
+
+        <motion.div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-2" {...item(0.32)}>
+          {choice.tag ? <span className="small accent font-semibold">{choice.tag}</span> : null}
+          <DialChips choice={choice} />
+        </motion.div>
 
         {challengerChoice ? (
-          <motion.p
-            className="small mt-3 px-3 py-2"
-            style={{ border: "1px solid var(--line)", borderRadius: "var(--r-sm)", color: "var(--fg-2)" }}
-            {...item(0.32)}
-          >
+          <motion.p className="small mt-2" style={{ color: "var(--fg-2)" }} {...item(0.36)}>
             {challengerChoice.id === choice.id ? (
               <>
                 <span style={{ color: "var(--fg)", fontWeight: 600 }}>Same as your friend.</span> They chose {choice.id.toUpperCase()} too.
               </>
             ) : (
               <>
-                <span style={{ color: "var(--fg)", fontWeight: 600 }}>Your friend chose {challengerChoice.id.toUpperCase()}.</span>{" "}
-                <span className="serif" style={{ fontStyle: "italic" }}>{challengerChoice.text}</span>
+                <span style={{ color: "var(--fg)", fontWeight: 600 }}>Your friend chose {challengerChoice.id.toUpperCase()}</span>
+                {challengerChoice.tag ? <span> · {challengerChoice.tag}</span> : null}
               </>
             )}
           </motion.p>
         ) : null}
 
-        <motion.div className="mt-4" {...item(0.38)}>
-          <section className="consequence" aria-label="What it gets you">
-            <p className="consequence-label">What it gets you</p>
+        <div className="mt-3.5">
+          <motion.section className="panel" aria-label="What it gets you" {...item(0.4)}>
+            <p className="label">What it gets you</p>
             <ul>
-              {choice.gets.map((g, i) => (
+              {(challengerChoice ? choice.gets.slice(0, 1) : choice.gets).map((g, i) => (
                 <li key={i}>{g}</li>
               ))}
             </ul>
-          </section>
-          <section className="consequence" aria-label="What it costs">
-            <p className="consequence-label">What it costs</p>
+          </motion.section>
+          <motion.section className="panel" aria-label="What it costs" {...item(0.46)}>
+            <p className="label" style={{ color: "var(--accent)" }}>
+              What it costs
+            </p>
             <ul>
-              {choice.costs.map((c, i) => (
+              {(challengerChoice ? choice.costs.slice(0, 1) : choice.costs).map((c, i) => (
                 <li key={i}>{c}</li>
               ))}
             </ul>
-          </section>
-        </motion.div>
-
-        <motion.div className="mt-3" {...item(0.48)}>
-          <AlternativePaths chosen={choice} others={others} onOpen={onDrawerOpen} footer={drawerFooter} />
-        </motion.div>
+          </motion.section>
+        </div>
       </div>
+
+      <Sheet open={paths} onClose={() => setPaths(false)} title="The other answers" theme="ink">
+        <OtherPaths chosen={choice} others={others} footer={pathsFooter} />
+      </Sheet>
     </GameShell>
   );
 }

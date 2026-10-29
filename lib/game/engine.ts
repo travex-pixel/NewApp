@@ -24,7 +24,17 @@ export interface Progress {
 export const EMPTY_PROGRESS: Progress = { plays: [], results: [] };
 
 /* ------------------------------------------------------------------ */
-/* Dates. Day boundary is UTC midnight everywhere: same five for everyone. */
+/* Dates. Today's five changes at the player's local midnight, like a daily
+   puzzle. Everyone in the same time zone gets the same five. */
+
+function pad(n: number): string {
+  return String(n).padStart(2, "0");
+}
+
+/** The device's local calendar date, YYYY-MM-DD. Call only in the browser. */
+export function localDateKey(now: Date = new Date()): string {
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+}
 
 export function utcDateKey(now: Date = new Date()): string {
   return now.toISOString().slice(0, 10);
@@ -37,7 +47,7 @@ export function dayNumber(dateKey: string): number {
 
 export function formatDayLabel(dateKey: string): string {
   const [y, m, d] = dateKey.split("-").map(Number);
-  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString("en-GB", {
+  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString("en-AU", {
     weekday: "long",
     day: "numeric",
     month: "long",
@@ -90,7 +100,7 @@ function pickVaried(pool: Scenario[], n: number): Scenario[] {
 const OPENERS = ["joke-at-your-expense", "auntie-marriage-question", "the-dinner-bill", "mum-shares-your-news", "the-wallet-forgetter"];
 
 /**
- * Today's five. Same for every player on the same UTC date. Category-varied,
+ * Today's five. Same for every player on the same calendar date. Category-varied,
  * and the first situation is always one of the quick, universal openers.
  */
 export function todaysSet(dateKey: string): Scenario[] {
