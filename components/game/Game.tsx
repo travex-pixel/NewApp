@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import type { Choice, Scenario } from "@/lib/content";
-import { localDateKey, nextSet, type PlayRecord } from "@/lib/game/engine";
+import { sydneyDateKey, nextSet, type PlayRecord } from "@/lib/game/engine";
 import { auraFor } from "@/lib/game/archetypes";
 import { commitProgress, readProgress } from "@/lib/game/progress-store";
 import { saveSession, type RoundSession } from "@/lib/game/session-store";
@@ -150,9 +150,9 @@ export function Game(props: GameProps) {
     const base = readProgress();
     setFoundBefore(new Set(base.results.map((r) => r.archetypeId)));
     setStorageOk(
-      commitProgress({ ...base, results: [...base.results, { archetypeId: archetype.id, dateKey: dateKey || localDateKey(), at: Date.now() }] }),
+      commitProgress({ ...base, results: [...base.results, { archetypeId: archetype.id, dateKey: dateKey || sydneyDateKey(), at: Date.now() }] }),
     );
-    track("round_completed", { archetype_id: archetype.id, round_index: roundIndex, date: dateKey || localDateKey() });
+    track("round_completed", { archetype_id: archetype.id, round_index: roundIndex, date: dateKey || sydneyDateKey() });
     setPhase("result");
   }, [mode, isLast, records, dateKey, roundIndex, router]);
 
@@ -160,7 +160,7 @@ export function Game(props: GameProps) {
     const played = new Set([...readProgress().plays.map((p) => p.scenarioId), ...round.map((s) => s.id)]);
     const nextIndex = roundIndex + 1;
     play.next();
-    setRound(nextSet(dateKey || localDateKey(), nextIndex, played));
+    setRound(nextSet(dateKey || sydneyDateKey(), nextIndex, played));
     setRoundIndex(nextIndex);
     setIndex(0);
     setRecords([]);

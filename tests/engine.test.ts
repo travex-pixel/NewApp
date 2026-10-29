@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { ROUND_LENGTH, SCENARIOS } from "@/lib/content";
-import { dayNumber, formatDayLabel, nextSet, setFromIds, todaysSet, utcDateKey } from "@/lib/game/engine";
+import { dayNumber, formatDayLabel, nextSet, setFromIds, sydneyDateKey, todaysSet, utcDateKey } from "@/lib/game/engine";
 
 describe("today's five", () => {
   it("is deterministic for a date and category-varied", () => {
@@ -58,5 +58,27 @@ describe("setFromIds", () => {
     expect(setFromIds(ids)?.map((s) => s.id)).toEqual(ids);
     expect(setFromIds([...ids, "nope"])).toBeNull();
     expect(setFromIds([])).toBeNull();
+  });
+});
+
+describe("the daily reset is midnight Sydney time", () => {
+  it("rolls over at 12am in Sydney, not UTC", () => {
+    // 29 Oct 2026, daylight saving (AEDT, UTC+11). 12:59pm UTC is 11:59pm Sydney.
+    expect(sydneyDateKey(new Date("2026-10-29T12:59:00Z"))).toBe("2026-10-29");
+    // One minute later it's midnight in Sydney: a new day, though UTC is still the 29th.
+    expect(sydneyDateKey(new Date("2026-10-29T13:00:00Z"))).toBe("2026-10-30");
+    expect(utcDateKey(new Date("2026-10-29T13:00:00Z"))).toBe("2026-10-29");
+  });
+
+  it("follows daylight saving: in winter midnight Sydney is 2pm UTC", () => {
+    // 15 June 2026, standard time (AEST, UTC+10).
+    expect(sydneyDateKey(new Date("2026-06-15T13:59:00Z"))).toBe("2026-06-15");
+    expect(sydneyDateKey(new Date("2026-06-15T14:00:00Z"))).toBe("2026-06-16");
+  });
+
+  it("is the same for everyone at the same instant", () => {
+    const instant = new Date("2026-10-30T02:00:00Z");
+    expect(sydneyDateKey(instant)).toBe("2026-10-30");
+    expect(todaysSet(sydneyDateKey(instant)).map((s) => s.id)).toEqual(todaysSet("2026-10-30").map((s) => s.id));
   });
 });

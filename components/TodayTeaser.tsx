@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
-import { formatDayLabel, localDateKey, todaysSet } from "@/lib/game/engine";
+import { formatDayLabel, sydneyDateKey, todaysSet } from "@/lib/game/engine";
 import { useHydrated, useProgress } from "@/lib/game/progress-store";
 import { ARCHETYPE_IDS } from "@/lib/game/archetypes";
 
@@ -13,7 +13,7 @@ export function TodayTeaser() {
 
   if (!hydrated) return <div style={{ minHeight: 76 }} aria-hidden="true" />;
 
-  const key = localDateKey();
+  const key = sydneyDateKey();
   const set = todaysSet(key);
   const found = new Set(progress.results.map((r) => r.archetypeId)).size;
   const playedToday = progress.results.some((r) => r.dateKey === key);
@@ -27,7 +27,7 @@ export function TodayTeaser() {
     >
       <p className="small muted">
         <span className="olive font-semibold">{formatDayLabel(key)}</span>
-        {playedToday ? " · done today, play another 5 any time" : " · a new five every day at midnight"}
+        {playedToday ? " · done today, play another 5 any time" : " · a new five at midnight, Sydney time"}
       </p>
       <ul className="mt-2 flex flex-wrap gap-1.5" aria-label="Today's situations">
         {set.map((s) => (

@@ -72,7 +72,7 @@ export default function AboutPage() {
               <span className="font-semibold" style={{ color: "var(--fg)" }}>
                 Today&rsquo;s five.
               </span>{" "}
-              A new five every day at midnight, your time. After that, play another five from the {SCENARIOS.length} situations written
+              A new five every day at midnight Sydney time, the same five for everyone, so you can compare with friends. After that, play another five from the {SCENARIOS.length} situations written
               so far.
             </p>
           </div>

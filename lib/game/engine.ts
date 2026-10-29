@@ -24,16 +24,22 @@ export interface Progress {
 export const EMPTY_PROGRESS: Progress = { plays: [], results: [] };
 
 /* ------------------------------------------------------------------ */
-/* Dates. Today's five changes at the player's local midnight, like a daily
-   puzzle. Everyone in the same time zone gets the same five. */
+/* Dates. Today's five changes at midnight Sydney time, for everyone, so a
+   whole group chat gets the same five whatever phone or time zone they're on.
+   Australia/Sydney follows daylight saving, so it's 12am AEST or AEDT. */
 
-function pad(n: number): string {
-  return String(n).padStart(2, "0");
-}
+export const DAILY_TIME_ZONE = "Australia/Sydney";
 
-/** The device's local calendar date, YYYY-MM-DD. Call only in the browser. */
-export function localDateKey(now: Date = new Date()): string {
-  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+/** Today's date in Sydney, YYYY-MM-DD. Safe on server and client. */
+export function sydneyDateKey(now: Date = new Date()): string {
+  const parts = new Intl.DateTimeFormat("en-AU", {
+    timeZone: DAILY_TIME_ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(now);
+  const get = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
+  return `${get("year")}-${get("month")}-${get("day")}`;
 }
 
 export function utcDateKey(now: Date = new Date()): string {
