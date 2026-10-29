@@ -2,24 +2,25 @@
 
 import { useState } from "react";
 import { track, trackOnce } from "@/lib/analytics";
-import type { ChallengeType } from "@/lib/analytics/events";
 import type { Choice } from "@/lib/content";
 import { challengePath, encodeChallenge } from "@/lib/game/challenge";
 import { SITE_NAME } from "@/lib/site";
 
 type State = "idle" | "working" | "shared" | "copied" | "manual";
 
+/**
+ * Sends one situation to a friend as a challenge link. The player's own
+ * answer travels inside the link and stays hidden until the friend answers.
+ */
 export function ShareButton({
   scenarioId,
   choiceId,
-  challengeType,
-  label = "Challenge a friend with this one",
+  label = "Send this situation to a friend",
   className = "btn btn-ghost btn-block",
   shareText,
 }: {
   scenarioId: string;
   choiceId: Choice["id"];
-  challengeType: ChallengeType;
   label?: string;
   className?: string;
   shareText?: string;
@@ -35,55 +36,41 @@ export function ShareButton({
     setState("working");
     const link = `${window.location.origin}${challengePath(code!)}`;
     setUrl(link);
-    trackOnce(`challenge:${code}`, "challenge_created", {
-      scenario_id: scenarioId,
-      challenge_type: challengeType,
-    });
+    trackOnce(`challenge:${code}`, "challenge_created", { scenario_id: scenarioId });
 
-    const text =
-      shareText ?? "I've answered this one. I want to see what you'd do.";
+    const text = shareText ?? "I've answered this one. I want to see what you'd do.";
     const payload = { title: SITE_NAME, text, url: link };
-
     const canNative =
       typeof navigator !== "undefined" &&
       typeof navigator.share === "function" &&
       (typeof navigator.canShare !== "function" || navigator.canShare(payload));
 
     if (canNative) {
-      track("share_attempted", { scenario_id: scenarioId, method: "native", challenge_type: challengeType });
+      track("share_attempted", { method: "native", scenario_id: scenarioId });
       try {
         await navigator.share(payload);
-        track("share_succeeded", { scenario_id: scenarioId, method: "native", challenge_type: challengeType });
+        track("share_succeeded", { method: "native", scenario_id: scenarioId });
         setState("shared");
         return;
       } catch (err) {
-        // User dismissed the sheet: not a failure, not a success.
         if (err instanceof Error && err.name === "AbortError") {
           setState("idle");
           return;
         }
-        // Anything else: fall through to the clipboard.
       }
     }
 
-    track("share_attempted", { scenario_id: scenarioId, method: "clipboard", challenge_type: challengeType });
+    track("share_attempted", { method: "clipboard", scenario_id: scenarioId });
     try {
       await navigator.clipboard.writeText(link);
-      track("share_succeeded", { scenario_id: scenarioId, method: "clipboard", challenge_type: challengeType });
+      track("share_succeeded", { method: "clipboard", scenario_id: scenarioId });
       setState("copied");
     } catch {
       setState("manual");
     }
   }
 
-  const text =
-    state === "shared"
-      ? "Sent"
-      : state === "copied"
-        ? "Link copied"
-        : state === "working"
-          ? "Opening share…"
-          : label;
+  const text = state === "shared" ? "Sent" : state === "copied" ? "Link copied" : state === "working" ? "Opening share…" : label;
 
   return (
     <div className="grid gap-2">
@@ -91,7 +78,7 @@ export function ShareButton({
         {text}
       </button>
       {state === "manual" && url ? (
-        <label className="small" style={{ color: "var(--fg-2)" }}>
+        <label className="small muted">
           Couldn&rsquo;t copy automatically. Here&rsquo;s the link:
           <input
             readOnly

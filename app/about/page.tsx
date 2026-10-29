@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Wordmark } from "@/components/Wordmark";
 import { SCENARIOS } from "@/lib/content";
+import { ARCHETYPE_IDS } from "@/lib/game/archetypes";
 
 export const metadata: Metadata = {
   title: "About",
@@ -10,52 +11,48 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <div className="page flex-1 flex flex-col" style={{ paddingTop: "max(env(safe-area-inset-top), 14px)" }}>
+    <div className="page min-h-dvh flex flex-col" style={{ paddingTop: "max(env(safe-area-inset-top), 14px)" }}>
       <header className="flex items-center justify-between py-3">
         <Wordmark />
-        <Link href="/play" className="small" style={{ color: "var(--fg-2)" }}>Play</Link>
+        <Link href="/play" className="small muted">
+          Play
+        </Link>
       </header>
-      <main className="pt-10 pb-16" style={{ maxWidth: "62ch" }}>
-        <h1 className="display" style={{ fontSize: "clamp(2.25rem, 9vw, 3.5rem)" }}>
-          Practice, not a verdict.
+      <main className="pt-10 pb-16" style={{ maxWidth: "60ch" }}>
+        <h1 className="display" style={{ fontSize: "clamp(2.25rem, 9vw, 3.25rem)" }}>
+          A game, not a verdict.
         </h1>
-
-        <div className="mt-8 grid gap-5" style={{ color: "var(--fg-2)" }}>
+        <div className="mt-8 grid gap-5 muted">
           <p>
-            Instinct is a game about the moments where a good response isn&rsquo;t obvious: a joke at your
-            expense, a boundary someone pushes on, a deadline that may be invented. You choose, you see what
-            the choice probably gets you and what it costs, and you leave with one idea you can actually use.
+            Instinct is a social judgement game. You get an everyday situation, a joke at your expense, an auntie with a question,
+            a group chat that&rsquo;s missing someone, and four ways to respond. Pick one, see what it probably gets you and what it
+            costs, and after five you get a social aura: an affectionate read of the pattern in your choices.
           </p>
           <p>
-            <span className="runin">What the scores mean.</span> A &ldquo;strong read&rdquo; is the response
-            that, in our judgement, gets the most of what you want at the least cost to the relationship. It is a
-            judgement, written by people, and we say so when another path is also fair. The score measures how
-            you played this round, inside the game&rsquo;s own rules. It is not a measurement of you, your
-            empathy, or your intelligence, and we&rsquo;d be suspicious of anything that claimed to be.
+            <span className="font-semibold" style={{ color: "var(--fg)" }}>The verdicts are opinions.</span> They&rsquo;re written by
+            people who&rsquo;ve been in those rooms, and the drawer under each one shows why the other paths can work too. Nothing
+            here has one universally correct answer, and we don&rsquo;t pretend otherwise.
           </p>
           <p>
-            <span className="runin">No invented science.</span> The principles are practical, not clinical:
-            separate impact from intention, ask before you anchor, correct in private. Where a situation
-            genuinely depends on things you can&rsquo;t know, the reveal says that too.
+            <span className="font-semibold" style={{ color: "var(--fg)" }}>The aura is a pattern, not a personality test.</span>{" "}
+            Five answers nudge six simple dials: directness, diplomacy, risk, empathy, boundaries and avoidance. The shape of those
+            dials picks one of {ARCHETYPE_IDS.length} archetypes. Play another five and you may get a different one. That&rsquo;s the
+            point: it describes a round, not you.
           </p>
           <p>
-            <span className="runin">What we keep.</span> Your answers and XP are stored in this browser, on this
-            device, and nowhere else. There are no accounts. If you clear your browser data, it&rsquo;s gone. Challenge
-            links carry the situation and the sender&rsquo;s answer inside the link itself, so nothing about you is
-            stored on a server to make them work. We record anonymous usage events (which situations get played,
-            where people stop) to improve the game.
+            <span className="font-semibold" style={{ color: "var(--fg)" }}>What we keep.</span> Your answers stay in this browser, on
+            this device, and nowhere else. No accounts. Challenge links carry the situation and the sender&rsquo;s answer inside the
+            link itself. We record anonymous usage events (which situations get played, where people stop) to improve the game.
           </p>
           <p>
-            <span className="runin">Today&rsquo;s situation.</span> Everyone gets the same one each day. It changes
-            at midnight UTC, so your local reset time depends on where you are.
-          </p>
-          <p>
-            There are {SCENARIOS.length} situations so far. More are being written.
+            <span className="font-semibold" style={{ color: "var(--fg)" }}>Today&rsquo;s five.</span> Everyone gets the same five each
+            day, changing at midnight UTC. After that, play another five from the {SCENARIOS.length} situations written so far.
           </p>
         </div>
-
-        <div className="mt-10 grid gap-3" style={{ maxWidth: "26rem" }}>
-          <Link href="/play" className="btn btn-block">Play a round</Link>
+        <div className="mt-10 grid gap-3" style={{ maxWidth: "24rem" }}>
+          <Link href="/play" className="btn btn-block">
+            Play today&rsquo;s 5
+          </Link>
         </div>
       </main>
     </div>

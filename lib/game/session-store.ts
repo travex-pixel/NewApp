@@ -1,17 +1,24 @@
 import type { PlayRecord } from "./engine";
 
 /**
- * The in-progress round, kept in sessionStorage so a refresh (common in
+ * The round in progress, kept in sessionStorage so a refresh (common in
  * in-app browsers) resumes where the player was instead of restarting.
- * Cleared when the round's result is shown.
+ *
+ * Three states are explicit:
+ *   - no session            → start a new round
+ *   - session, index < 5    → resume (the reveal re-shows if already answered)
+ *   - session, finished     → show the result again
  */
 
-const KEY = "instinct:round:v1";
+const KEY = "instinct:round:v2";
 
 export interface RoundSession {
+  dateKey: string;
+  roundIndex: number;
   roundIds: string[];
   index: number;
   records: PlayRecord[];
+  finished: boolean;
 }
 
 export function loadSession(): RoundSession | null {
@@ -20,9 +27,23 @@ export function loadSession(): RoundSession | null {
     const raw = window.sessionStorage.getItem(KEY);
     if (!raw) return null;
     const s = JSON.parse(raw) as Partial<RoundSession>;
-    if (!Array.isArray(s.roundIds) || typeof s.index !== "number" || !Array.isArray(s.records)) return null;
-    if (s.index < 0 || s.index >= s.roundIds.length) return null;
-    return { roundIds: s.roundIds, index: s.index, records: s.records };
+    if (
+      typeof s.dateKey !== "string" ||
+      typeof s.roundIndex !== "number" ||
+      !Array.isArray(s.roundIds) ||
+      typeof s.index !== "number" ||
+      !Array.isArray(s.records)
+    )
+      return null;
+    if (s.roundIds.length === 0 || s.index < 0 || s.index >= s.roundIds.length) return null;
+    return {
+      dateKey: s.dateKey,
+      roundIndex: s.roundIndex,
+      roundIds: s.roundIds,
+      index: s.index,
+      records: s.records,
+      finished: Boolean(s.finished),
+    };
   } catch {
     return null;
   }

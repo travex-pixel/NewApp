@@ -1,14 +1,14 @@
 # Instinct
 
-A social intelligence game. Real situations, hard choices, and the one idea worth keeping from each. Built with Next.js 16 (App Router, Cache Components), TypeScript, Tailwind CSS 4, deployed on Vercel.
+Five everyday social situations. Five instinctive decisions. One surprisingly revealing result.
 
-- `/` — the opening. Headline, the first situation visible, one button.
-- `/play` — a round of five situations, then a result.
-- `/daily` — one situation for everyone, resets at midnight UTC.
-- `/c/<code>` — a challenge link. The sender's answer is hidden until the recipient answers.
-- `/about` — what the game is, what it isn't, what it stores.
+A mobile-first social judgement game built with Next.js 16 (App Router, Cache Components), TypeScript, Tailwind CSS 4 and Motion, deployed on Vercel. No accounts, no database, no AI at runtime.
 
-No accounts, no database, no LLM at runtime. Progress is stored in the browser. Challenge state is carried in the URL.
+- `/` — the hook: headline, one sentence, one button.
+- `/play` — today's five (same for everyone, resets at midnight UTC) → reveal after each → your social aura. Then another five.
+- `/r/<archetype>` — a shareable result page with its own social preview; `/r/<archetype>/card` (4:5) and `/card-square` are the PNG cards.
+- `/c/<code>` — a challenge link for one situation; the sender's answer stays hidden until the recipient answers.
+- `/about` — what it is, what it isn't, what it keeps.
 
 ## Local setup
 
@@ -17,54 +17,49 @@ npm install
 npm run dev        # http://localhost:3000
 ```
 
-Checks:
+Checks (all must pass before pushing):
 
 ```bash
 npm run typecheck  # tsc --noEmit
 npm run lint       # eslint
-npm test           # vitest: content, engine, challenge codes, daily
+npm test           # vitest: content limits, engine, archetypes, challenge codes
 npm run build      # production build
 ```
 
-Optional environment (`.env.local`, see `.env.example`):
-
-```
-NEXT_PUBLIC_POSTHOG_KEY=        # product analytics; events are dropped without it
-NEXT_PUBLIC_POSTHOG_HOST=       # defaults to https://eu.i.posthog.com
-NEXT_PUBLIC_SITE_URL=           # absolute URL for social previews; Vercel's URL is used if unset
-```
+Optional environment (`.env.local`, see `.env.example`): `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST`, `NEXT_PUBLIC_SITE_URL`.
 
 ## Deploying to Vercel
 
-1. Push this repository to GitHub.
-2. In Vercel: **Add New → Project**, import the repo. Framework is detected as Next.js; no build settings to change.
-3. Under **Settings → Environment Variables**, add `NEXT_PUBLIC_POSTHOG_KEY` (and host) if you want product analytics. Nothing else is required.
-4. Under the project's **Analytics** and **Speed Insights** tabs, click Enable. The components are already in the layout.
-5. Deploy. Social previews (`/opengraph-image`, `/c/<code>/opengraph-image`) are generated on the Node runtime from the self-hosted fonts in `app/fonts`.
+1. Push to GitHub.
+2. Vercel → Add New → Project → import the repo. Next.js is detected; nothing to change.
+3. Settings → Environment Variables: `NEXT_PUBLIC_SITE_URL` (your production URL, so share links and the card footer are right) and, if you want product analytics, `NEXT_PUBLIC_POSTHOG_KEY`.
+4. Enable Web Analytics and Speed Insights in the project tabs.
+5. Deploy. Social previews and card PNGs render on the Node runtime from the self-hosted fonts in `app/fonts`.
 
-Or from the CLI: `npx vercel` (preview), `npx vercel --prod`.
+CLI: `npx vercel` (preview), `npx vercel --prod`.
 
-## Project layout
+## Layout
 
 ```
-app/                  routes, layout, fonts, social images, error and 404 pages
-components/           Game (state machine), ChoiceList, Reveal, RoundResult, ShareButton, …
-lib/content/          the scenario library and its types (authored, append-only ids)
-lib/game/             engine (rounds, scoring, milestones), challenge codec, daily, storage
-lib/analytics/        typed events and the provider abstraction
-tests/                vitest unit tests
-PRODUCT.md            durable product truth
-DESIGN.md             the visual system
-ANALYTICS.md          every event, where it fires, how to read it
+app/                   routes, layout, fonts, OG images, card PNG routes, error and 404
+components/game/       GameShell, SituationScreen, AnswerOption, Progress, RevealScreen,
+                       AlternativePaths, ResultScreen, AuraCard, MotifMark, ShareActions, Game, PlayGame
+components/            Wordmark, ForkMark, beacons, challenge ShareButton
+lib/content/           the scenario library (authored, append-only) and its limits
+lib/game/              engine (today's five, another five), archetypes (scoring), stores, challenge codec
+lib/analytics/         typed events and the provider abstraction
+lib/aura-image.tsx     the PNG card (ImageResponse)
+tests/                 vitest
+PRODUCT.md · DESIGN.md · ANALYTICS.md
 ```
 
-## Adding a scenario
+## Content rules
 
-Append to `lib/content/scenarios-3.ts` (or a new file registered in `lib/content/index.ts`). Rules the tests enforce: unique kebab-case `id`, three or four choices, exactly one `points: 3`, every choice has an `outcome`, a principle title of seven words or fewer, no claims of scientific authority. **Never reorder or remove scenarios**: challenge codes encode the scenario's position in `SCENARIOS`.
+Append to `lib/content/scenarios-3.ts` (or a new file registered in `lib/content/index.ts`). Tests enforce: unique kebab-case id, ≤ 48-char title, ≤ 270-char setup, four choices ≤ 100 chars with a verdict ≤ 60, one or two `gets` and `costs` lines ≤ 100, at least one dimension scored per choice and at least three distinct score directions per scenario, no claims of scientific authority. **Never reorder or delete**: challenge codes encode position.
 
 ## Honesty notes
 
-- The score measures play inside the game's rules. It is not a measure of a person, and the UI says so.
-- Challenge links obscure the sender's answer; they don't encrypt it. Anyone determined can read a four-character code. That's fine for a game.
-- Progress does not sync across devices. The result screen says so.
-- Fonts: Fraunces and Instrument Sans, both under the SIL Open Font License, self-hosted from `@fontsource`.
+- The social aura is a read of five choices under explicit rules (`lib/game/archetypes.ts`). The UI says so. It measures a round, not a person.
+- Challenge links obscure the sender's answer; they don't encrypt it.
+- Progress is per device and does not sync.
+- Native image sharing needs a real phone browser; it was tested here only as far as a headless browser allows (the download and copy fallbacks).

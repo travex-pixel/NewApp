@@ -3,32 +3,23 @@
  * See ANALYTICS.md for definitions and where each fires.
  */
 
-export type ChallengeType = "scenario" | "daily";
-export type ShareMethod = "native" | "clipboard";
-export type PlayMode = "round" | "challenge" | "daily";
+export type PlayMode = "round" | "challenge";
+export type ShareMethod = "native-image" | "download" | "copy-link" | "copy-text" | "native" | "clipboard";
 
 export interface EventMap {
   landing_viewed: { referrer_host?: string };
   start_clicked: Record<string, never>;
-  first_scenario_viewed: { scenario_id: string; category: string; mode: PlayMode };
   scenario_viewed: { scenario_id: string; category: string; mode: PlayMode; position: number };
-  answer_selected: {
-    scenario_id: string;
-    category: string;
-    choice_id: string;
-    points: number;
-    mode: PlayMode;
-  };
-  first_scenario_completed: { scenario_id: string; mode: PlayMode };
-  three_scenarios_completed: { mode: PlayMode };
-  five_scenarios_completed: { mode: PlayMode };
-  session_completed: { points: number; max_points: number; round_number: number };
-  challenge_created: { scenario_id: string; challenge_type: ChallengeType };
-  share_attempted: { scenario_id: string; method: ShareMethod; challenge_type: ChallengeType };
-  share_succeeded: { scenario_id: string; method: ShareMethod; challenge_type: ChallengeType };
+  answer_selected: { scenario_id: string; category: string; choice_id: string; mode: PlayMode; position: number };
+  drawer_opened: { scenario_id: string; mode: PlayMode };
+  round_completed: { archetype_id: string; round_index: number; date: string };
+  result_viewed: { archetype_id: string };
+  play_again: { round_index: number };
+  share_attempted: { method: ShareMethod; archetype_id?: string; scenario_id?: string };
+  share_succeeded: { method: ShareMethod; archetype_id?: string; scenario_id?: string };
+  challenge_created: { scenario_id: string };
   challenge_link_opened: { scenario_id: string; valid: boolean };
   challenge_completed: { scenario_id: string; same_choice: boolean };
-  daily_challenge_completed: { scenario_id: string; date: string; points: number };
   return_visit: { days_since_last: number };
 }
 

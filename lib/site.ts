@@ -1,6 +1,5 @@
 export const SITE_NAME = "Instinct";
-export const TAGLINE =
-  "Real situations. Hard choices. Find out what your instincts miss.";
+export const TAGLINE = "Five situations. Your gut instinct. Let's see what it says about you.";
 
 function resolveSiteUrl(): string {
   const explicit = process.env.NEXT_PUBLIC_SITE_URL;
@@ -13,3 +12,4 @@ function resolveSiteUrl(): string {
 }
 
 export const SITE_URL = resolveSiteUrl();
+export const SITE_HOST = SITE_URL.replace(/^https?:\/\//, "");

@@ -1,52 +1,53 @@
-# Instinct — design system
+# Instinct — design system: Espresso & Olive
 
 ## The idea
 
-Paper and ink. The situation and the decision happen on warm paper, set in a serif, like a column you're reading. The moment you choose, ink rises over the page and the reveal is printed on it. Uncertainty is paper; understanding is ink. One accent, vermilion, marks the signal: the current step, the strong read, the challenge.
+An independent magazine about human behaviour, crossed with a very well-made phone game. The situation and the decision happen on warm paper. The moment you choose, dark ink wipes up over the page and the verdict is printed on it. Paper is uncertainty; ink is understanding. Terracotta is the one loud colour and marks the signal: the current step, the chosen letter, the verdict tag, the cost. Olive is the quiet one: categories, progress done, the motif.
 
-Motif: the fork. One path becoming two, drawn horizontally so it reads as a road splitting and never as a letter. Wordmark, favicon, social image, empty states. Nowhere else.
+Motif: the fork. One path becoming two, drawn horizontally so it reads as a road splitting, never a letter. The wordmark, the favicon, the social image, and the six archetype marks (split, merge, straight, loop, pause, leap) are all built from it with the same stroke.
 
 ## Tokens (`app/globals.css`)
 
-| Token | Paper world | Ink world |
+| Token | Paper | Ink |
 |---|---|---|
-| `--bg` | `#f3eee4` paper | `#1b1917` ink |
-| `--fg` | `#1b1917` | `#f3eee4` |
-| `--fg-2` secondary text | `#4a453f` (8.2:1) | `#b9b1a3` (8.3:1) |
-| `--fg-3` tertiary | `#7a736a` | `#8d8578` |
-| `--line` hairlines | `#cfc6b6` | `#3a3631` |
-| `--accent` | `#b8371a` (5.0:1 on paper) | `#f0623a` (5.5:1 on ink) |
-| `--surface-2` pressed/selected | `#e8e1d2` | `#26231f` |
+| `--bg` | `#f4f1ea` | `#1a1c19` |
+| `--fg` | `#2d2b29` (12.6:1) | `#f4f1ea` (15.5:1) |
+| `--fg-2` secondary | `#5e5a54` (6.1:1) | `#b8b3a7` (8.4:1) |
+| `--fg-3` tertiary | `#8a857c` | `#8e897e` |
+| `--line` | `#ddd8cc` | `#383b34` |
+| `--accent` terracotta | `#c84b31` | `#e05a47` (4.8:1) |
+| `--accent-2` olive | `#5c6340` (5.6:1) | `#a3a882` |
 
-Switch worlds with the `.ink` class; everything beneath re-reads its tokens. No other colours exist.
+Switch worlds with the `.ink` class. Radii: 6 / 12 / 18px. No other colours, no gradients beyond the faint olive wash behind the desktop shell.
 
 ## Type
 
-- **Display / narrative:** Fraunces (variable, optical sizing on). Headlines at weight 500, tracking −0.022em, line-height 1.02. Scenario text at 1.25–1.375rem, weight 400. Principles as pull-quotes at 1.75rem. Italic only for the echo of the player's choice and the result artefact line.
-- **Interface:** Instrument Sans (variable). Body 1rem/1.55. Choices 1.0625rem weight 500. Buttons weight 600. Small text 0.875rem.
-- Run-in heads (`.runin`) instead of labels above paragraphs. No eyebrows, no kickers.
+- **Display:** Fraunces, variable, optical sizing on. Situation titles and verdicts at 1.5–1.9rem, weight 500, tracking −0.02em. Archetype names at weight 600–700. Italic for the echo of the player's choice and the card headline only.
+- **Interface:** Instrument Sans. Setup text 1.0625rem/1.45. Options 1rem/1.4 weight 500. Consequences 0.9375rem. Buttons 1.0625rem weight 600.
+- Two small uppercase labels exist in the whole product ("What it gets you", "What it costs"), plus their result-screen cousins. Nothing else is uppercase.
 
-## Layout
+## Layout: the shell
 
-One column, `max-width: 38rem`, 20px gutters on phones, 32px from 640px. Header is wordmark left, state right (meter / date / "A challenge"). Reading measure capped at 62ch for prose, 34rem for narrative.
+Every game screen is a fixed, full-viewport grid: `auto / minmax(0,1fr) / auto`. Header (wordmark + progress), main (centred when there's room, scrolls internally only when the device is genuinely too short), footer (one full-width CTA with safe-area padding). The page itself never scrolls during play; `body[data-game="on"]` locks it. At 390×844 the situation and the reveal fit with zero overflow; the test suite and `qa.mjs` check this.
 
-Hairlines separate; cards don't. The single exception is `.artefact`, the result composition built to be screenshotted, which gets a 1px border and one soft offset shadow.
+Desktop is the same column at 34rem with a faint olive wash, not a stretched phone.
 
 ## Controls
 
-- `.btn` ink-on-paper (paper-on-ink in the ink world), 52px min height, 6px radius. `.btn-ghost` outlined. `.btn-accent` vermilion, used once per screen at most.
-- `.choice` rows: hairline top/bottom, a 28px circular letter marker, text. Selected: marker fills, row tints left-to-right. Others dim to 38%.
-- `.meter`: five 2px hairline segments. Done = ink, current = accent.
-- Focus: 2px accent outline, 3px offset. Selection colour is the accent.
+- `.btn` ink-on-paper (paper-on-ink in the ink world), 52px, radius 12. `.btn-ghost` outlined. `.btn-accent` terracotta, used for the share action only.
+- `.option` answer rows: 1px line, radius 12, olive letter badge. Selected: fills ink, badge turns terracotta. Others dim to 45%. `whileTap` scales to 0.985.
+- `.marks` progress: five 4px marks, done olive, current terracotta and wider.
+- `.drawer-toggle` + `.drawer-body`: the "other paths" accordion, bounded to `min(28dvh, 300px)` with internal scroll so the CTA never moves.
+- `.aura-card`: the 4:5 collectible. Paper, inner hairline frame, motif, name, headline, terracotta bar, host.
 
 ## Motion
 
-One authored moment: `ink-rise`, the ink sheet wiping up over the paper (clip-path, 620ms, `cubic-bezier(0.16,1,0.3,1)`), its content fading up 240ms later. Scenario entry is a 480ms fade-up. The chosen marker pops once. Everything else is a 140–160ms transition. `prefers-reduced-motion` replaces the wipe with a 220ms fade and removes the rest.
+One choreographed moment: the ink sheet wipes up (`clip-path`, 550ms, `cubic-bezier(0.16,1,0.3,1)`), then the choice echo, verdict, consequences and drawer fade up in a 120–550ms stagger. Situations fade in over 350ms. The accordion animates height over 280ms. `prefers-reduced-motion` replaces all of it with 200ms fades. No confetti; the celebration is the card.
 
 ## Copy
 
-British spelling. Short sentences. Controls name their action ("Next situation", "See the round", "Challenge a friend with this one"). Praise only when earned ("Good instinct" for a strong read; "That one bit" for a backfire). Never "unlock", "level up", "AI-powered".
+British spelling. The verdict is second person and specific ("You kept the table warm and took the hit"). Consequences are one or two concrete lines each. Archetype copy is affectionate roast: it can tease, never humiliate, and it never claims to measure a person. Controls name their action.
 
 ## Don'ts
 
-Gradients as decoration, glass, glow, emoji as icons, progress rings, three-column feature grids, cards inside cards, fake numbers of any kind.
+Gradient decoration, glass, glow, emoji as icons, progress rings, feature grids, cards in cards, fake numbers, "unlock", "level up", "AI-powered".

@@ -1,39 +1,49 @@
 @import "tailwindcss";
 
 /* ------------------------------------------------------------------
-   Instinct — design tokens
-   Paper for the situation and the decision. Ink for the reveal.
-   One accent: signal (vermilion). Nothing else gets colour.
+   Instinct — Espresso & Olive
+   Warm paper for the situation and the decision. Dark ink for the reveal.
+   Terracotta is the only loud colour; olive is the quiet one.
    ------------------------------------------------------------------ */
 
 :root {
-  --paper: #f3eee4;
-  --paper-2: #e8e1d2;
-  --paper-3: #ddd5c3;
-  --ink: #1b1917;
-  --ink-2: #4a453f;
-  --ink-3: #7a736a;
-  --rule: #cfc6b6;
-  --signal: #b8371a;
-  --signal-on-ink: #f0623a;
-  --paper-on-ink: #f3eee4;
-  --paper-on-ink-2: #b9b1a3;
-  --rule-on-ink: #3a3631;
+  --paper: #f4f1ea;
+  --paper-2: #ebe7de;
+  --paper-3: #ddd8cc;
+  --ink: #2d2b29;
+  --ink-2: #5e5a54;
+  --ink-3: #8a857c;
+  --terracotta: #c84b31;
+  --terracotta-deep: #a63d27;
+  --olive: #5c6340;
+  --olive-soft: #a3a882;
+  --dark: #1a1c19;
+  --dark-2: #242622;
+  --dark-3: #30332d;
+  --dark-line: #383b34;
+  --paper-on-dark: #f4f1ea;
+  --paper-on-dark-2: #b8b3a7;
+  --paper-on-dark-3: #8e897e;
+  --terracotta-on-dark: #e05a47;
 
   --bg: var(--paper);
+  --bg-2: var(--paper-2);
   --fg: var(--ink);
   --fg-2: var(--ink-2);
   --fg-3: var(--ink-3);
-  --line: var(--rule);
-  --accent: var(--signal);
-  --surface-2: var(--paper-2);
+  --line: var(--paper-3);
+  --accent: var(--terracotta);
+  --accent-2: var(--olive);
 
   --font-display: var(--font-fraunces), "Iowan Old Style", "Palatino Linotype", Georgia, serif;
   --font-sans: var(--font-instrument), "Helvetica Neue", Arial, sans-serif;
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --measure: 38rem;
+  --measure: 30rem;
   --gutter: 20px;
+  --r-sm: 6px;
+  --r-md: 12px;
+  --r-lg: 18px;
 
   color-scheme: light;
 }
@@ -41,21 +51,22 @@
 @theme inline {
   --color-paper: var(--paper);
   --color-ink: var(--ink);
-  --color-signal: var(--signal);
+  --color-terracotta: var(--terracotta);
+  --color-olive: var(--olive);
   --font-display: var(--font-display);
   --font-sans: var(--font-sans);
 }
 
-/* The ink world: the reveal, the result, the challenge framing. */
-.ink,
-[data-theme="ink"] {
-  --bg: var(--ink);
-  --fg: var(--paper-on-ink);
-  --fg-2: var(--paper-on-ink-2);
-  --fg-3: #8d8578;
-  --line: var(--rule-on-ink);
-  --accent: var(--signal-on-ink);
-  --surface-2: #26231f;
+/* The dark world: the reveal and the result. */
+.ink {
+  --bg: var(--dark);
+  --bg-2: var(--dark-2);
+  --fg: var(--paper-on-dark);
+  --fg-2: var(--paper-on-dark-2);
+  --fg-3: var(--paper-on-dark-3);
+  --line: var(--dark-line);
+  --accent: var(--terracotta-on-dark);
+  --accent-2: var(--olive-soft);
   color-scheme: dark;
   background: var(--bg);
   color: var(--fg);
@@ -69,6 +80,7 @@ html {
   background: var(--paper);
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  height: 100%;
 }
 
 body {
@@ -76,26 +88,31 @@ body {
   color: var(--fg);
   font-family: var(--font-sans);
   font-size: 1rem;
-  line-height: 1.55;
-  font-feature-settings: "kern", "liga", "ss01";
+  line-height: 1.5;
+  font-feature-settings: "kern", "liga";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  min-height: 100%;
 }
 
-/* Browser surfaces carry the design too. */
+body[data-game="on"] {
+  overflow: hidden;
+  height: 100dvh;
+}
+
 ::selection {
   background: var(--accent);
   color: var(--paper);
 }
 .ink ::selection {
-  background: var(--signal-on-ink);
-  color: var(--ink);
+  background: var(--terracotta-on-dark);
+  color: var(--dark);
 }
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
-  border-radius: 2px;
+  border-radius: var(--r-sm);
 }
 a {
   color: inherit;
@@ -119,50 +136,41 @@ button {
   font-family: var(--font-display);
   font-optical-sizing: auto;
   font-weight: 500;
-  letter-spacing: -0.022em;
-  line-height: 1.02;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
   text-wrap: balance;
 }
-
 .serif {
   font-family: var(--font-display);
   font-optical-sizing: auto;
   font-weight: 400;
 }
-
-.narrative {
-  font-family: var(--font-display);
-  font-optical-sizing: auto;
-  font-weight: 400;
-  font-size: 1.25rem;
-  line-height: 1.45;
-  letter-spacing: -0.004em;
-  text-wrap: pretty;
-}
-@media (min-width: 640px) {
-  .narrative {
-    font-size: 1.375rem;
-    line-height: 1.42;
-  }
-}
-
 .small {
   font-size: 0.875rem;
   line-height: 1.45;
 }
-
+.tiny {
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
 .tabular {
   font-variant-numeric: tabular-nums;
 }
-
-/* Run-in heads inside reveal paragraphs. */
-.runin {
-  font-weight: 600;
-  color: var(--fg);
+.muted {
+  color: var(--fg-2);
+}
+.faint {
+  color: var(--fg-3);
+}
+.olive {
+  color: var(--accent-2);
+}
+.accent {
+  color: var(--accent);
 }
 
 /* ------------------------------------------------------------------
-   Layout
+   Layout: the game shell (fixed, no page scroll) and ordinary pages
    ------------------------------------------------------------------ */
 
 .page {
@@ -171,15 +179,70 @@ button {
   margin-inline: auto;
   padding-inline: var(--gutter);
 }
+
+.shell {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  background: var(--bg);
+  color: var(--fg);
+  padding-top: env(safe-area-inset-top);
+}
+.shell-head,
+.shell-main,
+.shell-foot {
+  width: 100%;
+  max-width: var(--measure);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+.shell-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 12px;
+  padding-bottom: 8px;
+  min-height: 52px;
+}
+.shell-main {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+}
+.shell-main > .centred {
+  margin-block: auto;
+  padding-block: 8px 16px;
+}
+.shell-foot {
+  padding-top: 10px;
+  padding-bottom: calc(14px + env(safe-area-inset-bottom));
+  display: grid;
+  gap: 8px;
+}
 @media (min-width: 640px) {
-  .page {
-    --gutter: 32px;
+  .shell {
+    --gutter: 28px;
+  }
+  .shell-head {
+    padding-top: 20px;
   }
 }
-
-.rule {
-  border: 0;
-  border-top: 1px solid var(--line);
+@media (min-width: 900px) {
+  /* Desktop: a composed column, not a stretched phone. */
+  .shell {
+    background:
+      radial-gradient(1200px 600px at 50% -10%, color-mix(in oklab, var(--bg) 92%, var(--accent-2)) 0%, transparent 70%),
+      var(--bg);
+  }
+  .shell-head,
+  .shell-main,
+  .shell-foot {
+    max-width: 34rem;
+  }
 }
 
 /* ------------------------------------------------------------------
@@ -192,8 +255,8 @@ button {
   justify-content: center;
   gap: 0.5rem;
   min-height: 3.25rem;
-  padding: 0.85rem 1.4rem;
-  border-radius: 6px;
+  padding: 0.8rem 1.25rem;
+  border-radius: var(--r-md);
   background: var(--fg);
   color: var(--bg);
   font-weight: 600;
@@ -201,22 +264,23 @@ button {
   letter-spacing: -0.005em;
   text-decoration: none;
   border: 1px solid transparent;
+  cursor: pointer;
   transition:
-    transform 160ms var(--ease-out),
-    background-color 160ms var(--ease-out),
-    opacity 160ms var(--ease-out);
+    transform 140ms var(--ease-out),
+    background-color 140ms var(--ease-out),
+    opacity 140ms var(--ease-out);
   -webkit-tap-highlight-color: transparent;
   user-select: none;
 }
 .btn:hover {
-  background: color-mix(in oklab, var(--fg) 88%, var(--accent));
+  background: color-mix(in oklab, var(--fg) 90%, var(--accent));
 }
 .btn:active {
-  transform: translateY(1px) scale(0.995);
+  transform: translateY(1px) scale(0.99);
 }
 .btn[disabled],
 .btn[aria-disabled="true"] {
-  opacity: 0.5;
+  opacity: 0.55;
   pointer-events: none;
 }
 .btn-ghost {
@@ -225,20 +289,23 @@ button {
   border-color: var(--line);
 }
 .btn-ghost:hover {
-  background: var(--surface-2);
+  background: var(--bg-2);
 }
 .btn-accent {
   background: var(--accent);
   color: var(--paper);
 }
-.ink .btn-accent {
-  color: var(--ink);
-}
 .btn-accent:hover {
-  background: color-mix(in oklab, var(--accent) 88%, var(--fg));
+  background: color-mix(in oklab, var(--accent) 85%, var(--fg));
 }
 .btn-block {
   width: 100%;
+}
+.btn-sm {
+  min-height: 2.5rem;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.9375rem;
+  border-radius: var(--r-sm);
 }
 
 .textlink {
@@ -255,136 +322,217 @@ button {
   color: var(--fg);
 }
 
-/* Choice rows: not cards. Hairlines, a marker, and the text. */
-.choice {
+/* Answer options: tactile rows, one radius, no shadow. */
+.option {
   display: grid;
-  grid-template-columns: 2rem 1fr;
-  gap: 0.9rem;
+  grid-template-columns: 1.75rem 1fr;
+  gap: 0.75rem;
   align-items: start;
   width: 100%;
-  padding: 1rem 0.25rem 1rem 0;
+  min-height: 3rem;
+  padding: 0.75rem 0.9rem 0.75rem 0.75rem;
   text-align: left;
-  background: transparent;
-  border: 0;
-  border-top: 1px solid var(--line);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: background-color 140ms var(--ease-out);
-  border-radius: 0;
+  transition:
+    background-color 140ms var(--ease-out),
+    border-color 140ms var(--ease-out),
+    opacity 200ms var(--ease-out);
 }
-.choice:last-of-type {
-  border-bottom: 1px solid var(--line);
+.option:hover:not([disabled]) {
+  background: var(--bg-2);
+  border-color: color-mix(in oklab, var(--line) 50%, var(--fg-3));
 }
-.choice:hover:not([disabled]) {
-  background: linear-gradient(to right, var(--surface-2), transparent 70%);
-}
-.choice[disabled] {
+.option[disabled] {
   cursor: default;
 }
-.choice:focus-visible {
-  outline-offset: -2px;
-  border-radius: 4px;
-}
-.choice-marker {
+.option-key {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 1.75rem;
   height: 1.75rem;
-  margin-top: 0.05rem;
   border-radius: 999px;
-  border: 1.5px solid var(--fg);
+  border: 1.5px solid var(--accent-2);
+  color: var(--accent-2);
   font-weight: 600;
   font-size: 0.8125rem;
-  letter-spacing: 0.02em;
   transition:
-    background-color 160ms var(--ease-out),
-    color 160ms var(--ease-out),
-    transform 220ms var(--ease-out);
+    background-color 140ms var(--ease-out),
+    color 140ms var(--ease-out),
+    border-color 140ms var(--ease-out);
 }
-.choice-text {
-  font-size: 1.0625rem;
+.option-text {
+  font-size: 1rem;
   line-height: 1.4;
   font-weight: 500;
   color: var(--fg);
   text-wrap: pretty;
+  padding-top: 0.15rem;
 }
-.choice[data-selected="true"] .choice-marker {
+.option[data-selected="true"] {
   background: var(--fg);
+  border-color: var(--fg);
+}
+.option[data-selected="true"] .option-text {
   color: var(--bg);
-  transform: scale(1.08);
 }
-.choice[data-selected="true"] {
-  background: linear-gradient(to right, var(--surface-2), transparent 80%);
+.option[data-selected="true"] .option-key {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--paper);
 }
-.choice[data-dimmed="true"] .choice-text,
-.choice[data-dimmed="true"] .choice-marker {
-  opacity: 0.38;
+.option[data-dimmed="true"] {
+  opacity: 0.45;
 }
 
-/* Progress: five hairline segments. Fills as the round goes on. */
-.meter {
-  display: grid;
+/* Progress: five marks. Done = olive, current = terracotta, ahead = line. */
+.marks {
+  display: inline-grid;
   grid-auto-flow: column;
-  grid-auto-columns: 1fr;
-  gap: 4px;
-  width: 7.5rem;
+  gap: 5px;
 }
-.meter > i {
+.marks > i {
   display: block;
-  height: 2px;
+  width: 14px;
+  height: 4px;
+  border-radius: 2px;
   background: var(--line);
-  border-radius: 1px;
 }
-.meter > i[data-on="true"] {
-  background: var(--fg);
+.marks > i[data-state="done"] {
+  background: var(--accent-2);
 }
-.meter > i[data-current="true"] {
+.marks > i[data-state="current"] {
+  background: var(--accent);
+  width: 22px;
+}
+
+/* Reveal: consequence blocks */
+.consequence {
+  padding: 0.6rem 0 0.2rem;
+}
+.consequence + .consequence {
+  border-top: 1px solid var(--line);
+}
+.consequence-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent-2);
+}
+.consequence ul {
+  margin-top: 0.3rem;
+  display: grid;
+  gap: 0.3rem;
+}
+.consequence li {
+  position: relative;
+  padding-left: 1rem;
+  color: var(--fg-2);
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  text-wrap: pretty;
+}
+.consequence li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 0.45rem;
+  height: 2px;
   background: var(--accent);
 }
-/* On the narrowest phones the meter alone carries the count (it's labelled for assistive tech). */
-@media (max-width: 359px) {
-  .meter-label {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    white-space: nowrap;
-  }
-  .meter {
-    width: 6rem;
-  }
+
+/* Drawer */
+.drawer-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.6rem 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+  background: transparent;
+  color: var(--fg);
+  font-weight: 500;
+  font-size: 0.9375rem;
+  text-align: left;
+  cursor: pointer;
+}
+.drawer-toggle svg {
+  flex: none;
+  transition: transform 220ms var(--ease-out);
+}
+.drawer-toggle[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+.drawer-body {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  max-height: min(28dvh, 300px);
+  padding-bottom: 0.5rem;
+}
+.alt {
+  padding: 0.6rem 0;
+  border-top: 1px dashed var(--line);
+}
+.alt-key {
+  display: inline-flex;
+  width: 1.4rem;
+  height: 1.4rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--fg-2);
+  margin-right: 0.5rem;
+  vertical-align: -0.25em;
+}
+
+/* The share card */
+.aura-card {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  width: 100%;
+  max-width: 340px;
+  margin-inline: auto;
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: var(--r-lg);
+  padding: 20px 20px 18px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 48px -28px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+}
+.aura-card::after {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 1px solid color-mix(in oklab, var(--ink) 22%, transparent);
+  border-radius: calc(var(--r-lg) - 6px);
+  pointer-events: none;
 }
 
 /* ------------------------------------------------------------------
-   Motion. One authored moment: the ink rising over the paper.
+   Motion
    ------------------------------------------------------------------ */
 
-.ink-sheet {
-  position: fixed;
-  inset: 0;
-  z-index: 40;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-  animation: ink-rise 620ms var(--ease-out) both;
-}
-@keyframes ink-rise {
-  from {
-    clip-path: inset(100% 0 0 0);
-  }
-  to {
-    clip-path: inset(0 0 0 0);
-  }
-}
-.ink-sheet > .page {
-  animation: fade-up 520ms var(--ease-out) 240ms both;
+.enter {
+  animation: fade-up 420ms var(--ease-out) both;
 }
 @keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -392,85 +540,14 @@ button {
   }
 }
 
-.enter {
-  animation: fade-up 480ms var(--ease-out) both;
-}
-.enter-delay {
-  animation-delay: 120ms;
-}
-
-.pulse-marker {
-  animation: marker-pop 320ms var(--ease-out);
-}
-@keyframes marker-pop {
-  0% {
-    transform: scale(1);
-  }
-  40% {
-    transform: scale(1.18);
-  }
-  100% {
-    transform: scale(1.08);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .ink-sheet {
-    animation: fade-in 220ms ease-out both;
-  }
-  .ink-sheet > .page,
-  .enter,
-  .pulse-marker {
+  .enter {
     animation: none;
   }
   .btn,
-  .choice,
-  .choice-marker {
+  .option,
+  .option-key,
+  .drawer-toggle svg {
     transition: none;
   }
-  @keyframes fade-in {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-}
-
-/* The fork mark, used in the wordmark and as the empty-state motif. */
-.fork {
-  display: inline-block;
-  vertical-align: -0.12em;
-}
-
-/* Share card composition (the result artefact). */
-.artefact {
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 1.5rem 1.25rem;
-  background: var(--bg);
-  box-shadow: 0 12px 32px -16px rgba(0, 0, 0, 0.45);
-}
-@media (min-width: 640px) {
-  .artefact {
-    padding: 2rem 1.75rem;
-  }
-}
-
-/* Simple body lock while the ink sheet is up. */
-body[data-sheet="open"] {
-  overflow: hidden;
-}
-
-/* Hairline list rows used in result screens. */
-.row {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.7rem 0;
-  border-top: 1px solid var(--line);
-}
-.row:last-child {
-  border-bottom: 1px solid var(--line);
 }

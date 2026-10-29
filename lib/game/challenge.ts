@@ -3,10 +3,10 @@ import { SCENARIOS, getScenario, type Choice, type Scenario } from "@/lib/conten
 /**
  * Challenge codes carry the whole challenge in the URL: which scenario, and
  * what the challenger chose. No database. The choice is lightly obscured so
- * the recipient can't read it off the link before answering; this is not
- * security, just concealment, and it's documented as such.
+ * the recipient can't read it off the link before answering; this is
+ * concealment, not security, and it's documented as such.
  *
- * Format: <scenarioIndex base36><choice digit><check digit>, e.g. "7k2".
+ * Format: <scenarioIndex base36, 2 chars><rotated choice digit><check char>.
  * Scenario index is positional in SCENARIOS, which is append-only.
  */
 
@@ -28,7 +28,6 @@ export function encodeChallenge(scenarioId: string, choiceId: Choice["id"]): str
   const index = SCENARIOS.findIndex((s) => s.id === scenarioId);
   const choiceIndex = CHOICES.indexOf(choiceId);
   if (index < 0 || choiceIndex < 0) return null;
-  // Obscure the choice by rotating it with the scenario index.
   const rotated = (choiceIndex + index) % 4;
   const body = index.toString(36).padStart(2, "0") + rotated.toString();
   return body + checksum(body);
@@ -45,8 +44,7 @@ export function decodeChallenge(code: string | undefined | null): Challenge | nu
   if (!Number.isFinite(index) || !Number.isFinite(rotated) || rotated > 3) return null;
   const scenario = SCENARIOS[index];
   if (!scenario) return null;
-  const choiceIndex = (((rotated - index) % 4) + 4) % 4;
-  const choiceId = CHOICES[choiceIndex];
+  const choiceId = CHOICES[(((rotated - index) % 4) + 4) % 4];
   if (!scenario.choices.some((c) => c.id === choiceId)) return null;
   return { scenario: getScenario(scenario.id)!, choiceId };
 }

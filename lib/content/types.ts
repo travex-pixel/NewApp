@@ -1,75 +1,79 @@
 /**
- * Content model for Real Life XP scenarios.
+ * Content model for Instinct.
  *
- * Everything here is authored and deterministic. No runtime generation.
+ * Everything is authored and deterministic. No runtime generation. Every
+ * scenario must fit one phone screen (390×844) in both the situation and the
+ * reveal, so the limits below are enforced by tests.
  */
 
 export type Category =
-  | "reading-the-room"
-  | "under-pressure"
-  | "awkward"
+  | "Friends"
+  | "Family"
+  | "Work"
+  | "Group chat"
+  | "Dating"
+  | "Neighbours"
+  | "Flatmates"
+  | "Strangers"
+  | "Money";
+
+/** The behavioural dimensions every answer nudges. */
+export type Dimension =
+  | "directness"
+  | "diplomacy"
+  | "risk"
+  | "empathy"
   | "boundaries"
-  | "disagreement"
-  | "bias"
-  | "uncertainty"
-  | "trade-offs"
-  | "conflict";
+  | "avoidance";
 
-export const CATEGORY_LABELS: Record<Category, string> = {
-  "reading-the-room": "Reading the room",
-  "under-pressure": "Under pressure",
-  awkward: "Awkward moments",
-  boundaries: "Boundaries",
-  disagreement: "Disagreement",
-  bias: "Biases",
-  uncertainty: "Incomplete information",
-  "trade-offs": "Trade-offs",
-  conflict: "Conflict",
-};
+export const DIMENSIONS: readonly Dimension[] = [
+  "directness",
+  "diplomacy",
+  "risk",
+  "empathy",
+  "boundaries",
+  "avoidance",
+];
 
-/** 0 = backfires, 1 = costly, 2 = defensible, 3 = strong read. */
-export type Points = 0 | 1 | 2 | 3;
-
-export const POINT_LABELS: Record<Points, string> = {
-  3: "Strong read",
-  2: "Defensible",
-  1: "Costly",
-  0: "Backfires",
-};
+/** -2 … 2 per dimension. Only the dimensions an answer actually moves. */
+export type Scores = Partial<Record<Dimension, -2 | -1 | 1 | 2>>;
 
 export interface Choice {
-  /** Stable within the scenario: "a" | "b" | "c" | "d". */
   id: "a" | "b" | "c" | "d";
-  /** What the player says or does. Written in first person, present tense. */
+  /** What the player does. First person, present tense. ≤ 85 chars. */
   text: string;
-  points: Points;
-  /** What this response most likely achieves. One or two sentences. */
-  outcome: string;
-  /** The downside or missed opportunity. One sentence. Empty string if none worth naming. */
-  cost: string;
+  /** The verdict headline. Second person, memorable. ≤ 52 chars. */
+  verdict: string;
+  /** Optional archetype-style tag, e.g. "Diplomatic instinct". ≤ 26 chars. */
+  tag?: string;
+  /** What it gets you. One or two specific lines, ≤ 95 chars each. */
+  gets: string[];
+  /** What it costs. One or two specific lines, ≤ 95 chars each. */
+  costs: string[];
+  /** Optional deeper read, shown inside the drawer. ≤ 220 chars. */
+  why?: string;
+  scores: Scores;
 }
 
 export interface Scenario {
-  /** Stable unique ID. Never reuse or renumber. */
+  /** Stable unique ID. Append-only; never renumber. */
   id: string;
   category: Category;
-  /** 1 easy, 2 medium, 3 hard (nuance required). */
-  difficulty: 1 | 2 | 3;
-  /** Short editorial title. Used in share previews. */
+  /** Headline. ≤ 48 chars. */
   title: string;
-  /** The situation, written to the player in second person. 2–4 short paragraphs max. */
+  /** One or two short paragraphs; ≤ 250 chars in total. */
   setup: string[];
-  /** The question the player answers. Usually "What do you do?" but can be sharper. */
+  /** Usually "What do you do?" */
   prompt: string;
-  choices: Choice[];
-  /** The transferable idea. Title is 2–6 words; body is one or two sentences. */
-  principle: { title: string; body: string };
-  /** The perceptive-friend reveal. 2–4 sentences, specific to this situation. */
-  insight: string;
-  /** Optional: when another path is also reasonable, say so honestly. */
-  alsoDefensible?: string;
-  /** Optional: what we genuinely can't know in this situation. Keeps the game honest. */
-  uncertain?: string;
+  choices: [Choice, Choice, Choice, Choice];
 }
 
-export const MAX_POINTS: Points = 3;
+export const LIMITS = {
+  title: 48,
+  setupTotal: 270,
+  choiceText: 100,
+  verdict: 60,
+  tag: 26,
+  line: 100,
+  why: 220,
+} as const;
