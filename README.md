@@ -32,7 +32,7 @@ Optional environment (`.env.local`, see `.env.example`): `NEXT_PUBLIC_POSTHOG_KE
 
 1. Push to GitHub.
 2. Vercel → Add New → Project → import the repo. Next.js is detected; nothing to change.
-3. Settings → Environment Variables: `NEXT_PUBLIC_SITE_URL` (your production URL, so share links and the card footer are right) and, if you want product analytics, `NEXT_PUBLIC_POSTHOG_KEY`.
+3. Settings → Environment Variables: optional. The site URL is picked up from Vercel automatically at build time; set `NEXT_PUBLIC_SITE_URL` only for a custom domain. Add `NEXT_PUBLIC_POSTHOG_KEY` if you want product analytics.
 4. Enable Web Analytics and Speed Insights in the project tabs.
 5. Deploy. Social previews and card PNGs render on the Node runtime from the self-hosted fonts in `app/fonts`.
 
