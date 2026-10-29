@@ -54,6 +54,14 @@ export default function AboutPage() {
             </p>
             <p>
               <span className="font-semibold" style={{ color: "var(--fg)" }}>
+                The psychology.
+              </span>{" "}
+              Where there&rsquo;s solid research behind a situation, the reveal says &ldquo;Behind it&rdquo; and shows the finding in
+              plain English, with who found it, so you can look it up. We only include findings that have held up. If the evidence is
+              shaky, it&rsquo;s not in the game.
+            </p>
+            <p>
+              <span className="font-semibold" style={{ color: "var(--fg)" }}>
                 What we keep.
               </span>{" "}
               Your answers stay in this browser on this phone. No accounts. Challenge links carry the situation and the sender&rsquo;s

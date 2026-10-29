@@ -48,6 +48,10 @@ Desktop is the same column at 34rem with a faint olive wash, not a stretched pho
 - `.drawer-toggle` + `.drawer-body`: the "other paths" accordion, bounded to `min(28dvh, 300px)` with internal scroll so the CTA never moves.
 - `.aura-card`: the 4:5 collectible. Paper, inner hairline frame, motif, name, headline, terracotta bar, host.
 
+## The psychology note
+
+On a reveal, if the situation has a research finding behind it, the secondary button reads "Behind it: <name>" with a lightbulb. The sheet leads with a panel: label, the concept in Fraunces, one or two plain sentences, and the source in small faint type. Then the why and the other answers.
+
 ## Sound and haptics
 
 Synthesised with Web Audio (`lib/sound.ts`), no files. A soft two-note pick, a swoosh and low bell on the reveal, a page-turn between situations, ticks while your five are read back, and a rising chord when the aura lands. Quiet by default, follows the iPhone silent switch, and the speaker button in the header turns it off for good. Android gets a short vibration on pick and on the aura.

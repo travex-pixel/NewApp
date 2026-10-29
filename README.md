@@ -56,6 +56,9 @@ PRODUCT.md · DESIGN.md · ANALYTICS.md
 
 ## Content rules
 
+Psychology notes live in `lib/content/science.ts`, keyed by scenario id. Only add a finding that has held up (replicated, meta-analysed, or a classic that stands), say what was actually found, and give a source someone can look up. Most situations don't need one.
+
+
 Append to `lib/content/scenarios-3.ts` (or a new file registered in `lib/content/index.ts`). Tests enforce: unique kebab-case id, ≤ 48-char title, ≤ 270-char setup, four choices ≤ 100 chars with a verdict ≤ 60, one or two `gets` and `costs` lines ≤ 100, at least one dimension scored per choice and at least three distinct score directions per scenario, no claims of scientific authority. **Never reorder or delete**: challenge codes encode position.
 
 ## Honesty notes

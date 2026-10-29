@@ -6,7 +6,7 @@ export const scenarios3: Scenario[] = [
     category: "Work",
     title: "The wrong moment for bad news",
     setup: [
-      "Sam just got the promotion. She's glowing by the kettle, planning her first week. You're the only one who knows her biggest client emailed an hour ago to say they're leaving. There's a call at four. She asks, beaming: \"So, what's new with you?\"",
+      "Sam just got the promotion and she's glowing by the kettle. You're the only one who knows her biggest client emailed an hour ago to say they're leaving. There's a call at four. She asks, beaming: \"So, what's new with you?\"",
     ],
     prompt: "What do you do?",
     choices: [
@@ -342,7 +342,7 @@ export const scenarios3: Scenario[] = [
     category: "Work",
     title: "More than you expected",
     setup: [
-      "You asked Ellie how her weekend was. Normal Monday thing. She's just told you, in the kitchen, that her marriage is ending, she found out Saturday, and she hasn't told anyone yet. You're friendly. You were not, until forty seconds ago, close.",
+      "You asked Ellie how her weekend was. Normal Monday thing. She's just told you, in the kitchen, that her marriage is ending and she hasn't told anyone yet. You're friendly. Until forty seconds ago, you weren't close.",
     ],
     prompt: "What do you say?",
     choices: [

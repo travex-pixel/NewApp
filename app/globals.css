@@ -318,10 +318,10 @@ button {
 
 /* Height-aware type: the same layout breathes on tall phones and tightens on short ones. */
 .fit-title {
-  font-size: clamp(1.35rem, 3.6dvh, 1.85rem);
+  font-size: clamp(1.3rem, min(3.6dvh, 6.6vw), 1.85rem);
 }
 .fit-body {
-  font-size: clamp(0.95rem, 2.35dvh, 1.0625rem);
+  font-size: clamp(0.92rem, min(2.35dvh, 4.25vw), 1.0625rem);
   line-height: 1.45;
 }
 .fit-verdict {
@@ -479,7 +479,7 @@ button {
     color 160ms var(--ease-out);
 }
 .option-text {
-  font-size: clamp(0.92rem, 2.2dvh, 1rem);
+  font-size: clamp(0.9rem, min(2.2dvh, 4.05vw), 1rem);
   line-height: 1.35;
   font-weight: 500;
   color: var(--fg);

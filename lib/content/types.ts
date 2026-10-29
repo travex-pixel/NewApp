@@ -55,6 +55,20 @@ export interface Choice {
   scores: Scores;
 }
 
+/**
+ * A well-supported finding from psychology or behavioural science that helps
+ * explain the situation. Only added where the evidence is solid; most
+ * scenarios have none. Plain English, with a source people can look up.
+ */
+export interface Science {
+  /** The concept's name, e.g. "The liking gap". ≤ 32 chars. */
+  name: string;
+  /** What the research found and why it matters here. ≤ 240 chars. */
+  line: string;
+  /** Who found it, short form, e.g. "Boothby et al., Psychological Science, 2018". ≤ 90 chars. */
+  source: string;
+}
+
 export interface Scenario {
   /** Stable unique ID. Append-only; never renumber. */
   id: string;
@@ -66,6 +80,7 @@ export interface Scenario {
   /** Usually "What do you do?" */
   prompt: string;
   choices: [Choice, Choice, Choice, Choice];
+  science?: Science;
 }
 
 export const LIMITS = {
@@ -76,4 +91,7 @@ export const LIMITS = {
   tag: 26,
   line: 100,
   why: 220,
+  scienceName: 32,
+  scienceLine: 240,
+  scienceSource: 90,
 } as const;

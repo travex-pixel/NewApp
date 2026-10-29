@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { DIMENSIONS, LIMITS, SCENARIOS } from "@/lib/content";
 import { ARCHETYPES } from "@/lib/game/archetypes";
+import { SCIENCE } from "@/lib/content/science";
 
 describe("scenario library", () => {
   it("has at least 20 scenarios with unique, stable ids", () => {
@@ -71,9 +72,21 @@ describe("scenario library", () => {
       for (const c of s.choices) strings.push(c.text, c.verdict, c.tag ?? "", c.why ?? "", ...c.gets, ...c.costs);
     }
     for (const a of Object.values(ARCHETYPES)) strings.push(a.name, a.headline, a.description, ...a.strengths, ...a.watchOuts);
+    for (const sc of Object.values(SCIENCE)) strings.push(sc.name, sc.line, sc.source);
     for (const text of strings) {
       expect(text, text).not.toMatch(/[;\u2014\u2013£€]/);
       expect(text, text).not.toMatch(/\b(genuinely|delve|tapestry|testament|navigate|journey|unlock|level up)\b/i);
     }
+  });
+
+  it("psychology notes are attached to real scenarios, short, and sourced", () => {
+    for (const [id, sc] of Object.entries(SCIENCE)) {
+      expect(SCENARIOS.some((s) => s.id === id), `${id} exists`).toBe(true);
+      expect(sc.name.length, `${id} name`).toBeLessThanOrEqual(LIMITS.scienceName);
+      expect(sc.line.length, `${id} line`).toBeLessThanOrEqual(LIMITS.scienceLine);
+      expect(sc.source.length, `${id} source`).toBeLessThanOrEqual(LIMITS.scienceSource);
+      expect(sc.source.length, `${id} has a source`).toBeGreaterThan(10);
+    }
+    expect(SCENARIOS.filter((s) => s.science).length).toBe(Object.keys(SCIENCE).length);
   });
 });

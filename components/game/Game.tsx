@@ -199,7 +199,7 @@ export function Game(props: GameProps) {
             total={total}
             selected={selected}
             onSelect={select}
-            note={mode === "challenge" ? "Someone sent you this. Their answer stays hidden until you pick yours." : undefined}
+            note={mode === "challenge" ? "Sent by a friend. Their pick stays hidden." : undefined}
             headRight={headRight}
           />
         </motion.div>

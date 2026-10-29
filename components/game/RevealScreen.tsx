@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
-import { ArrowRight, Layers } from "lucide-react";
+import { ArrowRight, Layers, Lightbulb } from "lucide-react";
 import type { Choice, Scenario } from "@/lib/content";
 import { DialChips } from "./DialChips";
 import { GameHeader } from "./GameHeader";
@@ -70,7 +70,18 @@ export function RevealScreen({
             }}
             {...item(0.5)}
           >
-            <Layers size={16} aria-hidden="true" /> See how the other answers play out
+            {scenario.science ? (
+              <>
+                <Lightbulb size={16} aria-hidden="true" />
+                <span>
+                  Behind it: <span className="font-semibold">{scenario.science.name}</span>
+                </span>
+              </>
+            ) : (
+              <>
+                <Layers size={16} aria-hidden="true" /> See how the other answers play out
+              </>
+            )}
           </motion.button>
           <motion.button type="button" className="btn btn-block" onClick={onNext} {...item(0.6)}>
             {ctaLabel} <ArrowRight size={18} aria-hidden="true" />
@@ -153,8 +164,8 @@ export function RevealScreen({
         </div>
       </div>
 
-      <Sheet open={paths} onClose={() => setPaths(false)} title="The other answers" theme="ink">
-        <OtherPaths chosen={choice} others={others} footer={pathsFooter} />
+      <Sheet open={paths} onClose={() => setPaths(false)} title={scenario.science ? "Behind it" : "The other answers"} theme="ink">
+        <OtherPaths chosen={choice} others={others} footer={pathsFooter} science={scenario.science} />
       </Sheet>
     </GameShell>
   );
