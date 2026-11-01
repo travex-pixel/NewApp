@@ -13,6 +13,23 @@ export interface ResultRecord {
   archetypeId: ArchetypeId;
   dateKey: string;
   at: number;
+  /** What was played: today's five, another five, or a friend's five. Older records have none and count as today's. */
+  kind?: "today" | "more" | "duel";
+}
+
+/** Has today's five been finished on this device? */
+export function playedTodaysFive(results: ResultRecord[], dateKey: string): boolean {
+  return results.some((r) => r.dateKey === dateKey && (r.kind === undefined || r.kind === "today"));
+}
+
+/** How many rounds of any kind were finished today. */
+export function roundsToday(results: ResultRecord[], dateKey: string): number {
+  return results.filter((r) => r.dateKey === dateKey && r.kind !== "duel").length;
+}
+
+/** Distinct days with at least one finished round. */
+export function daysPlayed(results: ResultRecord[]): number {
+  return new Set(results.map((r) => r.dateKey)).size;
 }
 
 /** Device-local progress. Nothing personal; nothing synced. */

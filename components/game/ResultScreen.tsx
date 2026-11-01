@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { Check, Copy, Download, Info, Link2, RotateCcw, Share2 } from "lucide-react";
+import { Check, Copy, Download, Info, Link2, RotateCcw, Share2, Users } from "lucide-react";
 import type { Archetype, Totals } from "@/lib/game/archetypes";
 import { ARCHETYPE_IDS, DIMENSION_LABELS, nextRoundTip, patternSummary } from "@/lib/game/archetypes";
 import { trackOnce } from "@/lib/analytics";
@@ -30,6 +30,8 @@ export function ResultScreen({
   onPlayAgain,
   roundIndex,
   storageOk,
+  onCompare,
+  toast,
 }: {
   archetype: Archetype;
   totals: Totals;
@@ -39,6 +41,10 @@ export function ResultScreen({
   onPlayAgain: () => void;
   roundIndex: number;
   storageOk: boolean;
+  /** Send these five to a friend to play and compare. */
+  onCompare?: () => void;
+  /** A message from the parent, e.g. after sharing a compare link. */
+  toast?: string | null;
 }) {
   const reduce = useReducedMotion();
   const [stage, setStage] = useState<"reading" | "card">(reduce ? "card" : "reading");
@@ -82,9 +88,15 @@ export function ResultScreen({
               {share.busy ? "Making your card…" : "Share your social aura"}
             </motion.button>
             <motion.div className="grid grid-cols-2 gap-2" {...fade(1.0)}>
-              <button type="button" className="btn btn-ghost btn-sm" onClick={() => setAbout(true)}>
-                <Info size={16} aria-hidden="true" /> What it means
-              </button>
+              {onCompare ? (
+                <button type="button" className="btn btn-sm" onClick={onCompare}>
+                  <Users size={16} aria-hidden="true" /> Challenge a mate
+                </button>
+              ) : (
+                <button type="button" className="btn btn-ghost btn-sm" onClick={() => setAbout(true)}>
+                  <Info size={16} aria-hidden="true" /> What it means
+                </button>
+              )}
               <button type="button" className="btn btn-ghost btn-sm" onClick={onPlayAgain}>
                 <RotateCcw size={16} aria-hidden="true" /> Play another 5
               </button>
@@ -135,16 +147,23 @@ export function ResultScreen({
                 New aura found · {found.size} of {ARCHETYPE_IDS.length}
               </motion.p>
             ) : null}
-            <div style={{ width: "min(100%, calc((100dvh - 290px) * 0.8), 360px)", marginInline: "auto" }}>
+            <div style={{ width: "min(100%, calc((100dvh - 320px) * 0.8), 360px)", marginInline: "auto" }}>
               <AuraCard archetype={archetype} entrance />
             </div>
+            {onCompare ? (
+              <motion.div className="text-center mt-2.5" {...fade(1.1)}>
+                <button type="button" className="textlink small" onClick={() => setAbout(true)}>
+                  What it means, and your collection
+                </button>
+              </motion.div>
+            ) : null}
           </motion.div>
         )}
       </AnimatePresence>
 
-      {share.toast ? (
+      {share.toast || toast ? (
         <div className="toast" role="status" aria-live="polite">
-          {share.toast}
+          {share.toast || toast}
         </div>
       ) : null}
 

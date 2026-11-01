@@ -52,6 +52,14 @@ Desktop is the same column at 34rem with a faint olive wash, not a stretched pho
 
 On a reveal, if the situation has a research finding behind it, the secondary button reads "Behind it: <name>" with a lightbulb. The sheet leads with a panel: label, the concept in Fraunces, one or two plain sentences, and the source in small faint type. Then the why and the other answers.
 
+## Challenge a mate
+
+The result screen's second row is "Challenge a mate" (filled) and "Play another 5" (ghost). The friend's version opens on the same game with a one-line note on the first situation. Their payoff screen leads with the match count in large Fraunces ("4 of 5"), a kind title ("Practically twins") and one line, then two aura tiles side by side and the five situations as a compact table with both letters. Mismatches show their letter in the accent colour. Primary action: "Send your five back".
+
+## What everyone picked
+
+When there are enough answers, the reveal's first line becomes "You chose B · 38% of players did too", and the sheet adds a bar chart of all four answers. Your answer's bar is the accent colour, the rest olive. Below 25 answers, nothing shows.
+
 ## Sound and haptics
 
 Synthesised with Web Audio (`lib/sound.ts`), no files. A soft two-note pick, a swoosh and low bell on the reveal, a page-turn between situations, ticks while your five are read back, and a rising chord when the aura lands. Quiet by default, follows the iPhone silent switch, and the speaker button in the header turns it off for good. Android gets a short vibration on pick and on the aura.

@@ -6,6 +6,8 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import type { Choice, Scenario } from "@/lib/content";
 import { sydneyDateKey, nextSet, type PlayRecord } from "@/lib/game/engine";
 import { auraFor } from "@/lib/game/archetypes";
+import { duelPath, encodeDuel, matchFor } from "@/lib/game/duel";
+import { voteAndRead, type Counts } from "@/lib/crowd";
 import { commitProgress, readProgress } from "@/lib/game/progress-store";
 import { saveSession, type RoundSession } from "@/lib/game/session-store";
 import { track, trackOnce } from "@/lib/analytics";
@@ -13,6 +15,8 @@ import type { PlayMode } from "@/lib/analytics/events";
 import { buzz, play } from "@/lib/sound";
 import { RevealScreen } from "./RevealScreen";
 import { ResultScreen, type Pick } from "./ResultScreen";
+import { DuelResultScreen } from "./DuelResultScreen";
+import { useLinkShare } from "./useLinkShare";
 import { SituationScreen } from "./SituationScreen";
 
 type Phase = "situation" | "reveal" | "result";
@@ -30,6 +34,8 @@ export interface GameProps {
   challengerChoice?: Choice["id"];
   /** challenge mode: extra content for the "other answers" sheet. */
   pathsFooter?: React.ReactNode;
+  /** duel mode: the friend's five answers, hidden until the end. */
+  friendChoices?: Choice["id"][];
   headRight?: React.ReactNode;
 }
 
@@ -51,6 +57,8 @@ export function Game(props: GameProps) {
   );
   const [storageOk, setStorageOk] = useState(true);
   const [foundBefore, setFoundBefore] = useState<Set<string> | null>(null);
+  const [crowd, setCrowd] = useState<Record<string, Counts | null>>({});
+  const link = useLinkShare();
   const timer = useRef<number | null>(null);
   const lock = useRef(false);
 
@@ -107,6 +115,8 @@ export function Game(props: GameProps) {
       setStorageOk(commitProgress({ ...base, plays: [...base.plays, record] }));
 
       track("answer_selected", { scenario_id: scenario.id, category: scenario.category, choice_id: choiceId, mode, position: index + 1 });
+      const sid = scenario.id;
+      void voteAndRead(sid, choiceId).then((counts) => setCrowd((prev) => ({ ...prev, [sid]: counts })));
       if (mode === "challenge" && props.challengerChoice) {
         track("challenge_completed", { scenario_id: scenario.id, same_choice: props.challengerChoice === choiceId });
       }
@@ -148,13 +158,42 @@ export function Game(props: GameProps) {
     }
     const { archetype } = auraFor(records);
     const base = readProgress();
+    const kind = mode === "duel" ? "duel" : roundIndex === 0 ? "today" : "more";
     setFoundBefore(new Set(base.results.map((r) => r.archetypeId)));
     setStorageOk(
-      commitProgress({ ...base, results: [...base.results, { archetypeId: archetype.id, dateKey: dateKey || sydneyDateKey(), at: Date.now() }] }),
+      commitProgress({
+        ...base,
+        results: [...base.results, { archetypeId: archetype.id, dateKey: dateKey || sydneyDateKey(), at: Date.now(), kind }],
+      }),
     );
     track("round_completed", { archetype_id: archetype.id, round_index: roundIndex, date: dateKey || sydneyDateKey() });
+    if (mode === "duel" && props.friendChoices) {
+      const theirs = auraFor(round.map((s, i) => ({ scenarioId: s.id, choiceId: props.friendChoices![i] }))).archetype;
+      track("duel_completed", {
+        matches: matchFor(records.map((r) => r.choiceId), props.friendChoices).count,
+        my_archetype: archetype.id,
+        their_archetype: theirs.id,
+      });
+    }
     setPhase("result");
-  }, [mode, isLast, records, dateKey, roundIndex, router]);
+  }, [mode, isLast, records, dateKey, roundIndex, router, round, props.friendChoices]);
+
+  /** Send these five, with my answers, to a friend to play and compare. */
+  const sendFive = useCallback(
+    (from: "result" | "duel") => {
+      const code = encodeDuel(
+        round.map((s) => s.id),
+        records.map((r) => r.choiceId),
+      );
+      if (!code) return;
+      track("duel_created", { from });
+      void link.shareLink(
+        duelPath(code),
+        from === "duel" ? "Your turn. I've played the same five. See how we compare:" : "I just played Instinct. Play my five and see if we think alike:",
+      );
+    },
+    [round, records, link],
+  );
 
   const playAgain = useCallback(() => {
     const played = new Set([...readProgress().plays.map((p) => p.scenarioId), ...round.map((s) => s.id)]);
@@ -171,7 +210,8 @@ export function Game(props: GameProps) {
 
   if (!scenario) return null;
 
-  const ctaLabel = mode === "challenge" ? "Play today's 5" : isLast ? "Reveal my social aura" : "Next situation";
+  const ctaLabel =
+    mode === "challenge" ? "Play today's 5" : !isLast ? "Next situation" : mode === "duel" ? "See how you compare" : "Reveal my social aura";
   const headRight = props.headRight ?? (mode === "challenge" ? <span className="small muted">A challenge</span> : undefined);
 
   const wipe = reduce
@@ -199,7 +239,13 @@ export function Game(props: GameProps) {
             total={total}
             selected={selected}
             onSelect={select}
-            note={mode === "challenge" ? "Sent by a friend. Their pick stays hidden." : undefined}
+            note={
+              mode === "challenge"
+                ? "Sent by a friend. Their pick stays hidden."
+                : mode === "duel" && index === 0
+                  ? "Your friend played these five. Compare at the end."
+                  : undefined
+            }
             headRight={headRight}
           />
         </motion.div>
@@ -218,11 +264,31 @@ export function Game(props: GameProps) {
             onPathsOpen={() => track("drawer_opened", { scenario_id: scenario.id, mode })}
             pathsFooter={props.pathsFooter}
             headRight={headRight}
+            crowd={crowd[scenario.id]}
           />
         </motion.div>
       ) : null}
 
-      {phase === "result" && aura ? (
+      {phase === "result" && aura && mode === "duel" && props.friendChoices ? (
+        <motion.div key="duel-result" {...wipe} style={{ position: "fixed", inset: 0, zIndex: 30 }}>
+          <DuelResultScreen
+            match={matchFor(
+              records.map((r) => r.choiceId),
+              props.friendChoices,
+            )}
+            me={aura.archetype}
+            them={auraFor(round.map((s, i) => ({ scenarioId: s.id, choiceId: props.friendChoices![i] }))).archetype}
+            rows={round.map((s, i) => ({
+              title: s.title,
+              mine: s.choices.find((c) => c.id === records[i]?.choiceId) ?? s.choices[0],
+              theirs: s.choices.find((c) => c.id === props.friendChoices![i]) ?? s.choices[0],
+            }))}
+            onSendBack={() => sendFive("duel")}
+            onPlayToday={() => router.push("/play")}
+            toast={link.toast}
+          />
+        </motion.div>
+      ) : phase === "result" && aura ? (
         <motion.div key={`result-${roundIndex}`} {...wipe} style={{ position: "fixed", inset: 0, zIndex: 30 }}>
           <ResultScreen
             archetype={aura.archetype}
@@ -233,6 +299,8 @@ export function Game(props: GameProps) {
             onPlayAgain={playAgain}
             roundIndex={roundIndex}
             storageOk={storageOk}
+            onCompare={mode === "round" && round.length === 5 ? () => sendFive("result") : undefined}
+            toast={link.toast}
           />
         </motion.div>
       ) : null}

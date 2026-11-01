@@ -720,3 +720,11 @@ button {
     transition: none;
   }
 }
+
+/* Bar lists inside panels have no dash markers. */
+.panel .bars li {
+  padding-left: 0;
+}
+.panel .bars li::before {
+  display: none;
+}

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { ArrowRight, Layers, Lightbulb } from "lucide-react";
 import type { Choice, Scenario } from "@/lib/content";
+import { shareOf, type Counts } from "@/lib/crowd";
 import { DialChips } from "./DialChips";
 import { GameHeader } from "./GameHeader";
 import { GameShell } from "./GameShell";
@@ -24,6 +25,7 @@ export function RevealScreen({
   onPathsOpen,
   pathsFooter,
   headRight,
+  crowd,
 }: {
   scenario: Scenario;
   choice: Choice;
@@ -35,7 +37,10 @@ export function RevealScreen({
   onPathsOpen?: () => void;
   pathsFooter?: React.ReactNode;
   headRight?: React.ReactNode;
+  /** What everyone picked, when the crowd is connected and has enough answers. */
+  crowd?: Counts | null;
 }) {
+  const mine = shareOf(crowd, choice.id);
   const reduce = useReducedMotion();
   const [paths, setPaths] = useState(false);
   const others = scenario.choices.filter((c) => c.id !== choice.id);
@@ -92,7 +97,15 @@ export function RevealScreen({
     >
       <div className="centred">
         <motion.div {...item(0.1)}>
-          <p className="small muted">You chose {choice.id.toUpperCase()}</p>
+          <p className="small muted">
+            You chose {choice.id.toUpperCase()}
+            {mine !== null ? (
+              <span>
+                {" "}
+                · <span className="font-semibold" style={{ color: "var(--fg)" }}>{mine}%</span> of players did too
+              </span>
+            ) : null}
+          </p>
           <p
             className={`serif mt-1 reveal-echo ${challengerChoice ? "hidden" : ""}`}
             style={{
@@ -165,7 +178,7 @@ export function RevealScreen({
       </div>
 
       <Sheet open={paths} onClose={() => setPaths(false)} title={scenario.science ? "Behind it" : "The other answers"} theme="ink">
-        <OtherPaths chosen={choice} others={others} footer={pathsFooter} science={scenario.science} />
+        <OtherPaths chosen={choice} others={others} footer={pathsFooter} science={scenario.science} crowd={crowd} />
       </Sheet>
     </GameShell>
   );

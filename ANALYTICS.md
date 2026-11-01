@@ -41,6 +41,9 @@ PostHog initialises lazily after first paint with `autocapture: false` and `pers
 | `challenge_created` | Once per challenge code per page lifetime (a link now exists). | `components/ShareButton.tsx` | `scenario_id` |
 | `challenge_link_opened` | A `/c/<code>` page renders. | `components/ChallengeBeacon.tsx` | `scenario_id` or `"invalid"`, `valid` |
 | `challenge_completed` | A challenge is answered. | `Game` | `scenario_id`, `same_choice` |
+| `duel_created` | "Challenge a mate" on the result screen, or "Send your five back" after a friend round. | `components/game/Game.tsx` | `from` (`result` or `duel`) |
+| `duel_link_opened` | A `/d/<code>` page renders. | `components/DuelBeacon.tsx` | `valid` |
+| `duel_completed` | A friend finishes the five they were sent. | `Game` | `matches` (0 to 5), `my_archetype`, `their_archetype` |
 | `return_visit` | Load ≥ 1 calendar day after the device's last recorded visit. | `components/AnalyticsProvider.tsx` | `days_since_last` |
 
 Share methods: `native-image` (Web Share API with the PNG card), `download`, `copy-link`, `copy-text`, and for challenge links `native` / `clipboard`.
@@ -67,6 +70,10 @@ Break down by `mode`, `referrer_host` and `archetype_id`.
 1. Locally with no key: every event prints to the console as `[analytics] <event> {…}`.
 2. With a key: PostHog → Activity within seconds.
 3. On Vercel: the Analytics and Speed Insights tabs.
+
+## What everyone picked (crowd counts)
+
+Separate from analytics. Each phone's first answer to a situation is counted anonymously in Redis (`votes:<scenario id>`, a hash of a/b/c/d counts) through `POST /api/vote`. No ids, no device fingerprint, no IP stored; the IP is only used for a per-minute rate limit key that expires after two minutes. Percentages only appear once a situation has 25 answers. If Redis isn't connected, the feature is simply off.
 
 ## Limits
 

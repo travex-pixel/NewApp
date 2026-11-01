@@ -43,5 +43,11 @@ function isPlayRecord(x: unknown): x is PlayRecord {
 function isResultRecord(x: unknown): x is ResultRecord {
   if (!x || typeof x !== "object") return false;
   const r = x as Record<string, unknown>;
-  return typeof r.archetypeId === "string" && isArchetypeId(r.archetypeId) && typeof r.dateKey === "string" && typeof r.at === "number";
+  return (
+    typeof r.archetypeId === "string" &&
+    isArchetypeId(r.archetypeId) &&
+    typeof r.dateKey === "string" &&
+    typeof r.at === "number" &&
+    (r.kind === undefined || r.kind === "today" || r.kind === "more" || r.kind === "duel")
+  );
 }

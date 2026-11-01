@@ -8,6 +8,8 @@ A mobile-first social judgement game built with Next.js 16 (App Router, Cache Co
 - `/play`: today's five (a new set at midnight Sydney time, the same for everyone) then a reveal after each, then your social aura. Then another five.
 - `/r/<archetype>`: a shareable result page with its own social preview; `/r/<archetype>/card` (4:5) and `/card-square` are the PNG cards.
 - `/c/<code>`: a challenge link for one situation; the sender's answer stays hidden until the recipient answers.
+- `/d/<code>`: "Challenge a mate". A friend plays your exact five, then sees how many you matched and both auras side by side.
+- `/api/vote`: anonymous answer counts for "what everyone picked" (needs Redis, see below).
 - `/about`: what it is, what it isn't, what it keeps.
 - `/palettes`: preview the three colour palettes on your own phone (not linked from the game).
 
@@ -35,7 +37,8 @@ Optional environment (`.env.local`, see `.env.example`): `NEXT_PUBLIC_POSTHOG_KE
 2. Vercel → Add New → Project → import the repo. Next.js is detected; nothing to change.
 3. Settings → Environment Variables: optional. The site URL is picked up from Vercel automatically at build time; set `NEXT_PUBLIC_SITE_URL` only for a custom domain. Add `NEXT_PUBLIC_POSTHOG_KEY` if you want product analytics.
 4. Enable Web Analytics and Speed Insights in the project tabs.
-5. Deploy. Social previews and card PNGs render on the Node runtime from the self-hosted fonts in `app/fonts`.
+5. For "what everyone picked": in the Vercel project, open **Storage**, add **Upstash Redis** (the free plan is plenty), and connect it to this project. That sets `KV_REST_API_URL` and `KV_REST_API_TOKEN`. Redeploy. Until then the percentages simply don't show. Never set `CROWD_MEMORY` on Vercel; it's for local testing only.
+6. Deploy. Social previews and card PNGs render on the Node runtime from the self-hosted fonts in `app/fonts`.
 
 CLI: `npx vercel` (preview), `npx vercel --prod`.
 

@@ -66,7 +66,8 @@ export default function AboutPage() {
               </span>{" "}
               Your answers stay in this browser on this phone. No accounts. Challenge links carry the situation and the sender&rsquo;s
               answer inside the link itself. We count anonymous things, like which situations get played and where people stop, to make
-              the game better.
+              the game better. Your first answer to each situation is added, anonymously, to the &ldquo;what everyone picked&rdquo;
+              numbers, which only show once enough people have answered.
             </p>
             <p>
               <span className="font-semibold" style={{ color: "var(--fg)" }}>

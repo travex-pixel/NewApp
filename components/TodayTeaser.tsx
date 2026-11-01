@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
-import { formatDayLabel, sydneyDateKey, todaysSet } from "@/lib/game/engine";
+import { daysPlayed, formatDayLabel, playedTodaysFive, sydneyDateKey, todaysSet } from "@/lib/game/engine";
 import { useHydrated, useProgress } from "@/lib/game/progress-store";
 import { ARCHETYPE_IDS } from "@/lib/game/archetypes";
 
@@ -16,7 +16,8 @@ export function TodayTeaser() {
   const key = sydneyDateKey();
   const set = todaysSet(key);
   const found = new Set(progress.results.map((r) => r.archetypeId)).size;
-  const playedToday = progress.results.some((r) => r.dateKey === key);
+  const playedToday = playedTodaysFive(progress.results, key);
+  const days = daysPlayed(progress.results);
 
   return (
     <motion.div
@@ -27,7 +28,7 @@ export function TodayTeaser() {
     >
       <p className="small muted">
         <span className="olive font-semibold">{formatDayLabel(key)}</span>
-        {playedToday ? " · done today, play another 5 any time" : " · a new five at midnight, Sydney time"}
+        {playedToday ? " · done for today. Play another 5 any time" : " · a new five at midnight, Sydney time"}
       </p>
       <ul className="mt-2 flex flex-wrap gap-1.5" aria-label="Today's situations">
         {set.map((s) => (
@@ -38,7 +39,8 @@ export function TodayTeaser() {
       </ul>
       {found > 0 ? (
         <p className="small faint mt-2">
-          You&rsquo;ve found {found} of {ARCHETYPE_IDS.length} auras.
+          You&rsquo;ve found {found} of {ARCHETYPE_IDS.length} auras
+          {days > 1 ? ` over ${days} days` : ""}.
         </p>
       ) : null}
     </motion.div>
