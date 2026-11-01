@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { Check, Copy, Download, Info, Link2, RotateCcw, Share2, Users } from "lucide-react";
 import type { Archetype, Totals } from "@/lib/game/archetypes";
@@ -32,6 +33,8 @@ export function ResultScreen({
   storageOk,
   onCompare,
   toast,
+  crowdMatches,
+  dailyNo,
 }: {
   archetype: Archetype;
   totals: Totals;
@@ -45,11 +48,16 @@ export function ResultScreen({
   onCompare?: () => void;
   /** A message from the parent, e.g. after sharing a compare link. */
   toast?: string | null;
+  /** For each of the five: did you pick what most people picked? */
+  crowdMatches?: boolean[];
+  /** Today's puzzle number, when this was today's five. */
+  dailyNo?: number;
 }) {
+  const withCrowd = crowdMatches ? crowdMatches.filter(Boolean).length : null;
   const reduce = useReducedMotion();
   const [stage, setStage] = useState<"reading" | "card">(reduce ? "card" : "reading");
   const [about, setAbout] = useState(false);
-  const share = useShare(archetype);
+  const share = useShare(archetype, { dailyNo, crowdMatches });
   const tip = useMemo(() => nextRoundTip(totals), [totals]);
 
   useEffect(() => {
@@ -89,8 +97,8 @@ export function ResultScreen({
             </motion.button>
             <motion.div className="grid grid-cols-2 gap-2" {...fade(1.0)}>
               {onCompare ? (
-                <button type="button" className="btn btn-sm" onClick={onCompare}>
-                  <Users size={16} aria-hidden="true" /> Challenge a mate
+                <button type="button" className="btn btn-sm" onClick={onCompare} style={{ whiteSpace: "nowrap" }}>
+                  Challenge a mate
                 </button>
               ) : (
                 <button type="button" className="btn btn-ghost btn-sm" onClick={() => setAbout(true)}>
@@ -147,11 +155,19 @@ export function ResultScreen({
                 New aura found · {found.size} of {ARCHETYPE_IDS.length}
               </motion.p>
             ) : null}
-            <div style={{ width: "min(100%, calc((100dvh - 320px) * 0.8), 360px)", marginInline: "auto" }}>
+            <div style={{ width: `min(100%, calc((100dvh - ${withCrowd !== null ? 345 : 320}px) * 0.8), 360px)`, marginInline: "auto" }}>
               <AuraCard archetype={archetype} entrance />
             </div>
+            {withCrowd !== null && crowdMatches ? (
+              <motion.p className="small text-center mt-2.5 muted" {...fade(1.05)}>
+                With the crowd on <span className="font-semibold" style={{ color: "var(--fg)" }}>{withCrowd} of 5</span>{" "}
+                <span aria-hidden="true" className="accent tabular" style={{ letterSpacing: "0.12em" }}>
+                  {crowdMatches.map((m) => (m ? "●" : "○")).join("")}
+                </span>
+              </motion.p>
+            ) : null}
             {onCompare ? (
-              <motion.div className="text-center mt-2.5" {...fade(1.1)}>
+              <motion.div className="text-center mt-1.5" {...fade(1.1)}>
                 <button type="button" className="textlink small" onClick={() => setAbout(true)}>
                   What it means, and your collection
                 </button>
@@ -208,6 +224,9 @@ export function ResultScreen({
             {storageOk ? "" : " This device couldn't save your round."}
           </p>
           <AuraCollection found={found} current={archetype.id} />
+          <Link href="/g/new" className="btn btn-ghost btn-block">
+            <Users size={16} aria-hidden="true" /> Play with your group chat
+          </Link>
           <div>
             <p className="label">More ways to share</p>
             <div className="mt-2 grid grid-cols-3 gap-2">

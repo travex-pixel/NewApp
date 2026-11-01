@@ -21,6 +21,17 @@ export function shareOf(counts: Counts | null | undefined, choiceId: string): nu
   return Math.round((100 * (counts[choiceId as keyof Counts] ?? 0)) / total);
 }
 
+/** The most picked answer, if there are enough answers to say. */
+export function topChoice(counts: Counts | null | undefined): string | null {
+  if (!counts || totalVotes(counts) < MIN_VOTES) return null;
+  return (["a", "b", "c", "d"] as const).reduce((best, k) => ((counts[k] ?? 0) > (counts[best] ?? 0) ? k : best), "a");
+}
+
+/** Spoiler-free dots for sharing: filled where you picked what most people picked. */
+export function crowdDots(matches: boolean[]): string {
+  return matches.map((m) => (m ? "●" : "○")).join("");
+}
+
 /* ------------------------------------------------------------------ */
 /* Browser side: vote once per situation per device, then read counts. */
 

@@ -1,14 +1,17 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Users } from "lucide-react";
 import { Wordmark } from "@/components/Wordmark";
 import { HeroMark } from "@/components/HeroMark";
 import { LandingBeacon } from "@/components/LandingBeacon";
 import { SoundToggle } from "@/components/SoundToggle";
 import { TodayTeaser } from "@/components/TodayTeaser";
+import { PackPicker } from "@/components/PackPicker";
+import { storeEnabled } from "@/lib/server/store";
 import { SCENARIOS } from "@/lib/content";
 import { ARCHETYPE_IDS } from "@/lib/game/archetypes";
 
 export default function Home() {
+  const groups = storeEnabled();
   return (
     <div className="grain relative min-h-dvh flex flex-col">
       <div className="page flex-1 flex flex-col" style={{ paddingTop: "max(env(safe-area-inset-top), 14px)" }}>
@@ -39,11 +42,19 @@ export default function Home() {
             <Link href="/play" className="btn btn-block" prefetch>
               Play today&rsquo;s 5 <ArrowRight size={18} aria-hidden="true" />
             </Link>
+            {groups ? (
+              <Link href="/g/new" className="btn btn-ghost btn-block">
+                <Users size={18} aria-hidden="true" /> Play with your group chat
+              </Link>
+            ) : null}
             <p className="small faint">About a minute. No overthinking. No sign-up.</p>
           </div>
 
           <div className="mt-9">
             <TodayTeaser />
+          </div>
+          <div className="mt-8">
+            <PackPicker />
           </div>
         </main>
 

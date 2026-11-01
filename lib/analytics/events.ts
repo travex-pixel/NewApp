@@ -3,7 +3,7 @@
  * See ANALYTICS.md for definitions and where each fires.
  */
 
-export type PlayMode = "round" | "challenge" | "duel";
+export type PlayMode = "round" | "challenge" | "duel" | "pack" | "group";
 export type ShareMethod = "native-image" | "download" | "copy-link" | "copy-text" | "native" | "clipboard";
 
 export interface EventMap {
@@ -24,6 +24,10 @@ export interface EventMap {
   duel_created: { from: "result" | "duel" };
   duel_link_opened: { valid: boolean };
   duel_completed: { matches: number; my_archetype: string; their_archetype: string };
+  pack_started: { pack_id: string };
+  group_created: Record<string, never>;
+  group_joined: { members_before: number };
+  group_board_viewed: { members: number };
 }
 
 export type EventName = keyof EventMap;

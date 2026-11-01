@@ -4,10 +4,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import type { Choice, Scenario } from "@/lib/content";
-import { sydneyDateKey, nextSet, type PlayRecord } from "@/lib/game/engine";
+import { dailyNumber, sydneyDateKey, nextSet, type PlayRecord } from "@/lib/game/engine";
 import { auraFor } from "@/lib/game/archetypes";
 import { duelPath, encodeDuel, matchFor } from "@/lib/game/duel";
-import { voteAndRead, type Counts } from "@/lib/crowd";
+import { topChoice, voteAndRead, type Counts } from "@/lib/crowd";
 import { commitProgress, readProgress } from "@/lib/game/progress-store";
 import { saveSession, type RoundSession } from "@/lib/game/session-store";
 import { track, trackOnce } from "@/lib/analytics";
@@ -36,6 +36,10 @@ export interface GameProps {
   pathsFooter?: React.ReactNode;
   /** duel mode: the friend's five answers, hidden until the end. */
   friendChoices?: Choice["id"][];
+  /** pack mode: how to pick another five. Defaults to the general library. */
+  nextRound?: (roundIndex: number, played: Set<string>) => Scenario[];
+  /** group mode: called with the five answers instead of showing a result. */
+  onComplete?: (records: PlayRecord[]) => void;
   headRight?: React.ReactNode;
 }
 
@@ -158,7 +162,7 @@ export function Game(props: GameProps) {
     }
     const { archetype } = auraFor(records);
     const base = readProgress();
-    const kind = mode === "duel" ? "duel" : roundIndex === 0 ? "today" : "more";
+    const kind = mode === "duel" ? "duel" : mode === "round" && roundIndex === 0 ? "today" : "more";
     setFoundBefore(new Set(base.results.map((r) => r.archetypeId)));
     setStorageOk(
       commitProgress({
@@ -175,8 +179,12 @@ export function Game(props: GameProps) {
         their_archetype: theirs.id,
       });
     }
+    if (props.onComplete) {
+      props.onComplete(records);
+      return;
+    }
     setPhase("result");
-  }, [mode, isLast, records, dateKey, roundIndex, router, round, props.friendChoices]);
+  }, [mode, isLast, records, dateKey, roundIndex, router, round, props]);
 
   /** Send these five, with my answers, to a friend to play and compare. */
   const sendFive = useCallback(
@@ -199,19 +207,32 @@ export function Game(props: GameProps) {
     const played = new Set([...readProgress().plays.map((p) => p.scenarioId), ...round.map((s) => s.id)]);
     const nextIndex = roundIndex + 1;
     play.next();
-    setRound(nextSet(dateKey || sydneyDateKey(), nextIndex, played));
+    setRound(props.nextRound ? props.nextRound(nextIndex, played) : nextSet(dateKey || sydneyDateKey(), nextIndex, played));
     setRoundIndex(nextIndex);
     setIndex(0);
     setRecords([]);
     setSelected(null);
     setPhase("situation");
     track("play_again", { round_index: nextIndex });
-  }, [round, roundIndex, dateKey]);
+  }, [round, roundIndex, dateKey, props]);
 
   if (!scenario) return null;
 
   const ctaLabel =
-    mode === "challenge" ? "Play today's 5" : !isLast ? "Next situation" : mode === "duel" ? "See how you compare" : "Reveal my social aura";
+    mode === "challenge"
+      ? "Play today's 5"
+      : !isLast
+        ? "Next situation"
+        : mode === "duel"
+          ? "See how you compare"
+          : mode === "group"
+            ? "See who's who"
+            : "Reveal my social aura";
+
+  // Did you pick what most people picked? Only when every situation has enough answers.
+  const tops = records.map((r) => topChoice(crowd[r.scenarioId]));
+  const crowdMatches = records.length === 5 && tops.every((t) => t !== null) ? records.map((r, i) => r.choiceId === tops[i]) : undefined;
+  const todayNo = mode === "round" && roundIndex === 0 && dateKey ? dailyNumber(dateKey) : undefined;
   const headRight = props.headRight ?? (mode === "challenge" ? <span className="small muted">A challenge</span> : undefined);
 
   const wipe = reduce
@@ -299,7 +320,9 @@ export function Game(props: GameProps) {
             onPlayAgain={playAgain}
             roundIndex={roundIndex}
             storageOk={storageOk}
-            onCompare={mode === "round" && round.length === 5 ? () => sendFive("result") : undefined}
+            onCompare={(mode === "round" || mode === "pack") && round.length === 5 ? () => sendFive("result") : undefined}
+            crowdMatches={crowdMatches}
+            dailyNo={todayNo}
             toast={link.toast}
           />
         </motion.div>

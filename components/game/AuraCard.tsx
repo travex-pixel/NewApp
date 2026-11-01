@@ -5,6 +5,7 @@ import type { Archetype } from "@/lib/game/archetypes";
 import { ForkMark } from "@/components/ForkMark";
 import { SITE_HOST } from "@/lib/site";
 import { MotifMark } from "./MotifMark";
+import { useHydrated } from "@/lib/game/progress-store";
 
 /**
  * The social aura card. A 4:5 collectible in paper and ink that tilts under
@@ -13,6 +14,8 @@ import { MotifMark } from "./MotifMark";
  */
 export function AuraCard({ archetype, entrance = false }: { archetype: Archetype; entrance?: boolean }) {
   const reduce = useReducedMotion();
+  // Light effects only once the page is live, so the server and first client render match.
+  const lively = useHydrated() && !reduce;
   const px = useMotionValue(0);
   const py = useMotionValue(0);
   const rx = useSpring(useTransform(py, [-0.5, 0.5], [9, -9]), { stiffness: 180, damping: 18 });
@@ -46,7 +49,7 @@ export function AuraCard({ archetype, entrance = false }: { archetype: Archetype
         animate={entrance && !reduce ? { opacity: 1, y: 0, scale: 1, rotateX: 0 } : undefined}
         transition={{ type: "spring", damping: 20, stiffness: 140, mass: 0.9 }}
       >
-        {!reduce ? (
+        {lively ? (
           <motion.div
             className="aura-sheen"
             aria-hidden="true"
@@ -55,7 +58,7 @@ export function AuraCard({ archetype, entrance = false }: { archetype: Archetype
             transition={{ duration: 1.3, delay: entrance ? 0.7 : 0.2, ease: [0.4, 0, 0.2, 1] }}
           />
         ) : null}
-        {!reduce ? (
+        {lively ? (
           <motion.div
             aria-hidden="true"
             style={{

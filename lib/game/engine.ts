@@ -68,6 +68,13 @@ export function dayNumber(dateKey: string): number {
   return Math.floor((Date.UTC(y, m - 1, d) - Date.UTC(2024, 0, 1)) / 86_400_000);
 }
 
+/** Instinct #1 was 29 October 2026, Sydney time. Like Wordle's number, it's the same for everyone. */
+export const LAUNCH_DATE = "2026-10-29";
+
+export function dailyNumber(dateKey: string): number {
+  return dayNumber(dateKey) - dayNumber(LAUNCH_DATE) + 1;
+}
+
 export function formatDayLabel(dateKey: string): string {
   const [y, m, d] = dateKey.split("-").map(Number);
   return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString("en-AU", {

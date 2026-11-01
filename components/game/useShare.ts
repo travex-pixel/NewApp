@@ -5,13 +5,14 @@ import type { Archetype } from "@/lib/game/archetypes";
 import { track } from "@/lib/analytics";
 import type { ShareMethod } from "@/lib/analytics/events";
 import { SITE_NAME } from "@/lib/site";
+import { crowdDots } from "@/lib/crowd";
 
 /**
  * Real sharing, in order of preference: native share with the PNG card,
  * download of the same PNG, copy link, copy text. A cancelled share sheet
  * is neither a success nor a failure.
  */
-export function useShare(archetype: Archetype) {
+export function useShare(archetype: Archetype, extra: { dailyNo?: number; crowdMatches?: boolean[] } = {}) {
   const [busy, setBusy] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const timer = useRef<number | null>(null);
@@ -27,7 +28,13 @@ export function useShare(archetype: Archetype) {
   }, []);
 
   const resultUrl = () => `${window.location.origin}/r/${slug}`;
-  const shareText = () => `I got ${archetype.name} on ${SITE_NAME}. "${archetype.headline}" Five situations, gut instinct. Which one are you? ${resultUrl()}`;
+  // Spoiler-free, Wordle style: the aura and how often you went with the crowd, never your answers.
+  const shareText = () => {
+    const lines = [`${SITE_NAME}${extra.dailyNo ? ` #${extra.dailyNo}` : ""}: ${archetype.name}`];
+    if (extra.crowdMatches) lines.push(`With the crowd ${extra.crowdMatches.filter(Boolean).length}/5 ${crowdDots(extra.crowdMatches)}`);
+    lines.push(`"${archetype.headline}"`, `Which one are you? ${resultUrl()}`);
+    return lines.join("\n");
+  };
   const attempted = (method: ShareMethod) => track("share_attempted", { method, archetype_id: slug });
   const succeeded = (method: ShareMethod) => track("share_succeeded", { method, archetype_id: slug });
 

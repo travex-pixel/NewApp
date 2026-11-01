@@ -24,7 +24,7 @@ PostHog initialises lazily after first paint with `autocapture: false` and `pers
 
 ## Events
 
-`mode` is `round` (today's five / another five) or `challenge` (opened from a `/c/<code>` link).
+`mode` is `round` (today's five or another five), `pack`, `challenge` (a `/c/<code>` link), `duel` (a `/d/<code>` link) or `group` (a `/g/<id>` room).
 
 | Event | Fires | Where | Properties |
 |---|---|---|---|
@@ -44,6 +44,10 @@ PostHog initialises lazily after first paint with `autocapture: false` and `pers
 | `duel_created` | "Challenge a mate" on the result screen, or "Send your five back" after a friend round. | `components/game/Game.tsx` | `from` (`result` or `duel`) |
 | `duel_link_opened` | A `/d/<code>` page renders. | `components/DuelBeacon.tsx` | `valid` |
 | `duel_completed` | A friend finishes the five they were sent. | `Game` | `matches` (0 to 5), `my_archetype`, `their_archetype` |
+| `pack_started` | A pack page starts a round. | `components/game/PackGame.tsx` | `pack_id` |
+| `group_created` | Someone creates a group. | `components/group/GroupCreate.tsx` | – |
+| `group_joined` | Someone enters their name and starts the group's five. | `components/group/GroupRoom.tsx` | `members_before` |
+| `group_board_viewed` | The group board is shown (once per member count per page). | `GroupRoom` | `members` |
 | `return_visit` | Load ≥ 1 calendar day after the device's last recorded visit. | `components/AnalyticsProvider.tsx` | `days_since_last` |
 
 Share methods: `native-image` (Web Share API with the PNG card), `download`, `copy-link`, `copy-text`, and for challenge links `native` / `clipboard`.

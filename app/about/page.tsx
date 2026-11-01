@@ -67,7 +67,8 @@ export default function AboutPage() {
               Your answers stay in this browser on this phone. No accounts. Challenge links carry the situation and the sender&rsquo;s
               answer inside the link itself. We count anonymous things, like which situations get played and where people stop, to make
               the game better. Your first answer to each situation is added, anonymously, to the &ldquo;what everyone picked&rdquo;
-              numbers, which only show once enough people have answered.
+              numbers, which only show once enough people have answered. If you play in a group, the name you type and your five
+              answers are stored with that group for 30 days so everyone can see the board, then deleted.
             </p>
             <p>
               <span className="font-semibold" style={{ color: "var(--fg)" }}>

@@ -60,6 +60,14 @@ The result screen's second row is "Challenge a mate" (filled) and "Play another 
 
 When there are enough answers, the reveal's first line becomes "You chose B · 38% of players did too", and the sheet adds a bar chart of all four answers. Your answer's bar is the accent colour, the rest olive. Below 25 answers, nothing shows.
 
+## Group mode
+
+A room for a group chat. The join page is paper: the host's name in olive, "Who's who in the group chat?", one name field, one button. The board is ink: "Who's who", two highlight panels (most alike, the wildcard), then one row per person with their aura motif and name. How the group split lives in a sheet. Footer: "Invite the group chat" (accent), then "How we split" and "Refresh".
+
+## Packs and the daily number
+
+Six packs sit on the home page as a 3 by 2 grid of raised cards with a count. Today's five carries a number like Wordle ("Instinct #4", from launch day). The share text is spoiler-free: the aura, how often you went with the crowd as filled and empty dots, the roast, the link.
+
 ## Sound and haptics
 
 Synthesised with Web Audio (`lib/sound.ts`), no files. A soft two-note pick, a swoosh and low bell on the reveal, a page-turn between situations, ticks while your five are read back, and a rising chord when the aura lands. Quiet by default, follows the iPhone silent switch, and the speaker button in the header turns it off for good. Android gets a short vibration on pick and on the aura.
